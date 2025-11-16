@@ -1,0 +1,262 @@
+/* Modal Overlay - Estilo elegante inspirado no ModalRegisterUser */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal Content - Container principal */
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Título do Modal */
+.modal-content h2 {
+    margin: 0 0 30px 0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.8rem;
+    color: #333;
+    text-align: center;
+    font-weight: 700;
+}
+
+/* Avatar Upload Section */
+.avatar-upload {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.avatar-label {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.avatar-label:hover {
+    transform: scale(1.05);
+}
+
+.avatar-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #E5DBF7;
+    box-shadow: 0 4px 15px rgba(112, 21, 227, 0.2);
+    transition: all 0.3s ease;
+}
+
+.avatar-label:hover .avatar-preview {
+    border-color: #7015E3;
+    box-shadow: 0 6px 20px rgba(112, 21, 227, 0.3);
+}
+
+.avatar-input {
+    display: none;
+}
+
+/* Form Groups - Estilo dos campos */
+.form-group-modal {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group-modal label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+.form-group-modal input,
+.form-group-modal select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.form-group-modal input:focus,
+.form-group-modal select:focus {
+    border-color: #B77EFF;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(183, 126, 255, 0.1);
+}
+
+.form-group-modal input::placeholder {
+    color: #999;
+}
+
+/* Modal Actions - Botões */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.modal-actions button {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.btn-cancel {
+    background-color: #f1f1f1;
+    color: #555;
+}
+
+.btn-cancel:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-save {
+    background-color: #7015E3;
+    color: white;
+}
+
+.btn-save:hover:not(:disabled) {
+    background-color: #5a10b5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(112, 21, 227, 0.3);
+}
+
+.btn-save:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loading State */
+.btn-save:disabled::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 8px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Scrollbar personalizada */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #B77EFF;
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #7015E3;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 25px;
+        width: 95%;
+        max-width: none;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    .avatar-preview {
+        width: 80px;
+        height: 80px;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-actions button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 20px;
+    }
+
+    .form-group-modal input,
+    .form-group-modal select {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+}

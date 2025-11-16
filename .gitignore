@@ -1,0 +1,12 @@
+# Arquivo de segredos
+.env
+
+# Dependências
+/node_modules/
+
+# Arquivos de build (produção)
+/build/
+
+# Logs e arquivos de sistema
+npm-debug.log
+.DS_Store

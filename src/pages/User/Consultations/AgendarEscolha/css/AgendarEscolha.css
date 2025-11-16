@@ -1,0 +1,50 @@
+/* src/pages/User/Consultations/css/AgendarEscolha.css */
+
+.type-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.choice-button {
+  width: 100%;
+  max-width: 450px;
+  padding: 25px;
+  border: 2px solid #EBE4F4;
+  border-radius: 15px;
+  background-color: #f9f7ff;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+  text-decoration: none; /* Remover sublinhado do Link */
+}
+
+.choice-button:hover {
+  border-color: #B77EFF;
+  background-color: #fff;
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.type-icon {
+  font-size: 2.5rem;
+  color: #8D7EFB;
+}
+
+.choice-button span {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+  display: block;
+}
+
+.choice-button small {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 400;
+}

@@ -1,0 +1,100 @@
+.calendario-container {
+  padding: 30px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  border-radius: 20px;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  width: 100%;
+  max-width: 100%;
+}
+
+.month-title {
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: capitalize;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 15px;
+}
+
+.dia-semana {
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding-bottom: 15px;
+}
+
+.dia-celula {
+  background: linear-gradient(135deg, #ffffff 0%, #fdfcff 100%);
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  min-height: 100px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.dia-celula:hover {
+  border-color: #667eea;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+}
+
+.dia-celula.vazio { 
+  background-color: transparent; 
+  border: none;
+  cursor: default;
+}
+
+.dia-celula.vazio:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.numero-dia { 
+  font-weight: 700; 
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.marcadores-container { 
+  margin-top: 12px; 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 6px; 
+}
+
+.marcador-consulta {
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+.marcador-consulta:hover {
+  transform: scale(1.3);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.6);
+}

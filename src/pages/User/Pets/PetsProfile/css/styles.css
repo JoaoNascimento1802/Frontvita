@@ -1,0 +1,213 @@
+/* Estilo da página */
+.pet-profile-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
+  background-color: white;
+}
+
+.welcome-title {
+  text-align: center;
+  font-size: 2.2rem;
+  background: linear-gradient(135deg, #8D7EFB 0%, #B77EFF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 2rem 0 1rem 0;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* Container principal */
+.pet-profile-container {
+    background-color: #EBE4F4;
+    width: 80%;
+    max-width: 1200px;
+    min-height: 350px;
+    margin: 20px auto 40px;
+    padding: 30px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Estilizar o botão de adicionar pet */
+.action-button-primary {
+    background-color: #8D7EFB;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: center;
+    margin-top: 20px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 6px rgba(141, 126, 251, 0.2);
+}
+
+.action-button-primary:hover {
+    background-color: #B77EFF;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(141, 126, 251, 0.3);
+}
+
+/* Card do pet */
+.pet-card {
+  background-color: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+  min-height: 150px;
+}
+
+/* Foto do pet */
+.pet-photo-container {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #8E44AD;
+  flex-shrink: 0;
+}
+
+.pet-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Container para nome e gênero alinhados */
+.pet-name-gender-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 0;
+}
+
+/* Informações do pet */
+.pet-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+
+.owner-name {
+  font-size: 2rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.pet-details {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pet-name {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin: 0;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pet-gender {
+  background-color: #8D7EFB;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+/* Botão de detalhes */
+.details-button {
+  background: none;
+  border: none;
+  color: #C79DFD;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 15px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  margin-left: auto;
+}
+
+.details-button:hover {
+  background-color: #f3e5f5;
+}
+
+.arrow {
+  font-size: 1.2rem;
+}
+
+/* Botão Adicionar Pet */
+.add-pet-button {
+  background-color: #8D7EFB;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: center;
+  margin-top: auto;
+  display: inline-block;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  text-align: center;
+}
+
+.add-pet-button:hover {
+  background-color: #B77EFF;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(142, 68, 173, 0.3);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .pet-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .pet-name-gender-container {
+    justify-content: center;
+  }
+  
+  .details-button {
+    position: static;
+    margin-left: 0;
+    justify-content: center;
+  }
+  
+  .pet-profile-container {
+    width: 90%;
+    padding: 20px;
+  }
+}

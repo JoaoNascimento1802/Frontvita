@@ -1,0 +1,570 @@
+/* =================================================== */
+/* ESTILOS GERAIS PARA PÁGINAS DE CONSULTA E CALENDÁRIO */
+/* =================================================== */
+.pet-profile-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background-color: white;
+}
+
+/* Título da página de consultas (Minhas Consultas) */
+.main-content-consultation h1 {
+  text-align: center;
+  font-size: 2.2rem;
+  background: linear-gradient(135deg, #8D7EFB 0%, #B77EFF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 3rem 0 2rem 0;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  padding-top: 1rem;
+}
+
+/* Container principal roxo (fundo da lista) */
+.pet-profile-container {
+  background-color: #EBE4F4;
+  width: 90%;
+  max-width: 1100px;
+  min-height: 350px;
+  margin: 0 auto 40px auto;
+  padding: 30px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Botão "Novo Agendamento" */
+.add-consulta-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #dcd6f7;
+}
+
+.action-button-primary {
+  background-color: #8D7EFB;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 6px rgba(141, 126, 251, 0.2);
+}
+.action-button-primary:hover {
+  background-color: #B77EFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(141, 126, 251, 0.3);
+}
+
+/* Botões de navegação (Pendentes, Agendados, Histórico, Calendário) */
+.status-section {
+  text-align: center;
+  padding: 1rem 0;
+}
+.status-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin: 0 auto;
+  width: fit-content;
+  flex-wrap: wrap;
+}
+.status-button {
+  padding: 15px 35px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #C79DFD;
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-width: 120px;
+  text-decoration: none;
+}
+.status-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.status-button.active {
+  background-color: #8D7EFB;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+
+/* =================================================== */
+/* ESTILOS ESPECÍFICOS PARA O CALENDÁRIO */
+/* =================================================== */
+.calendario-container {
+  max-width: 1100px;
+  padding: 30px;
+  background-color: #f9f7ff;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  font-family: 'Poppins', sans-serif;
+}
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+.dia-semana {
+  text-align: center;
+  font-weight: 600;
+  color: #a491d9;
+  padding-bottom: 10px;
+}
+.dia-celula {
+  background-color: #fff;
+  border: 1px solid #f0eaff;
+  border-radius: 10px;
+  min-height: 120px;
+  padding: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+.dia-celula:not(.vazio):hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+.dia-celula.vazio {
+  background-color: transparent;
+  border: none;
+}
+.numero-dia {
+  font-weight: 500;
+  color: #9c89ce;
+}
+.marcadores-container {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.marcador-consulta {
+  width: 10px;
+  height: 10px;
+  background-color: #b388ff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.marcador-consulta:hover {
+  background-color: #8d7efb;
+}
+
+
+/* =================================================== */
+/* ESTILOS PARA OS CARDS DE CONSULTA (LISTA) */
+/* =================================================== */
+.consultas-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.pet-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.pet-card {
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  min-height: 100px;
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #f0eaff;
+}
+.pet-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(141, 126, 251, 0.15);
+}
+.pet-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: hidden;
+}
+.pet-name {
+  font-size: 1.3rem; 
+  color: #333;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.card-subtitle {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* --- BADGES DE STATUS PADRONIZADOS (usados na lista e nos detalhes) --- */
+.status-badge {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.status-badge.pendente {
+  background-color: #FFF3CD;
+  color: #856404;
+  border: 1px solid #FFEEBA;
+}
+.status-badge.agendada {
+  background-color: #D4EDDA;
+  color: #155724;
+  border: 1px solid #C3E6CB;
+}
+.status-badge.finalizada {
+  background-color: #E2E3E5;
+  color: #383D41;
+  border: 1px solid #D6D8DB;
+}
+.status-badge.cancelada,
+.status-badge.recusada {
+  background-color: #F8D7DA;
+  color: #721C24;
+  border: 1px solid #F5C6CB;
+}
+
+
+/* =================================================== */
+/* --- ESTILOS PARA PÁGINAS DE DETALHES --- */
+/* =================================================== */
+.pets-details-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background-color: white;
+}
+
+/* CORREÇÃO: Título centralizado */
+.welcome-section {
+  text-align: center;
+  padding: 2rem 0;
+}
+.welcome-title {
+  font-size: 2.2rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+/* Container externo (roxo claro) */
+.pet-details-wrapper {
+  background-color: #E5DBF7;
+  padding: 30px 20px; 
+  border-radius: 25px;
+  margin: 0 auto 40px auto;
+  width: 90%;
+  max-width: 700px; 
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Container interno (branco) */
+.pet-details-container {
+  background-color: #FFFFFF; 
+  width: 100%; 
+  padding: 40px; 
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin: 0 auto;
+  box-sizing: border-box; 
+}
+
+/* --- REMOVIDO --- */
+/* O .status-badge-container foi removido */
+
+/* Avatar do Pet (se houver) */
+.avatar-display {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+.card-avatar-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #8D7EFB;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 3rem;
+  border: 3px solid #8E44AD;
+}
+
+/* Formulário de Detalhes */
+.details-form {
+  width: 100%;
+}
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 25px; 
+}
+.form-group {
+  flex: 1;
+}
+.form-group.full-width {
+  flex-basis: 100%;
+}
+.form-group label {
+  display: block;
+  font-size: 0.8rem; 
+  color: #667eea; 
+  margin-bottom: 8px;
+  font-weight: 700; 
+  text-transform: uppercase; 
+}
+
+/* Campos de valor (read-only) */
+.detail-value {
+  background-color: #f9f7ff; 
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #EBE4F4; 
+  font-size: 1rem;
+  color: #333;
+  min-height: 48px;
+  word-wrap: break-word;
+  font-weight: 500;
+}
+.detail-value.long-text {
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/* Campos editáveis (formulário de edição) */
+.info-field.editable {
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: white;
+  border: 1px solid #8D7EFB;
+}
+.info-field.editable:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(141, 126, 251, 0.2);
+}
+
+
+/* Botões de Ação */
+.details-actions {
+  display: flex;
+  justify-content: space-between; 
+  gap: 15px;
+  margin-top: 40px;
+}
+
+.back-button, .remove-button, .decline-button, .edit-button, .save-button, .cancel-edit-button {
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+}
+.back-button {
+  background-color: #f5f5f5;
+  color: #555;
+  border: 1px solid #ddd;
+}
+.back-button:hover {
+  background-color: #e0e0e0;
+}
+.remove-button, .decline-button, .cancel-edit-button {
+  background-color: #ff4d4d;
+  color: white;
+}
+.remove-button:hover, .decline-button:hover, .cancel-edit-button:hover {
+  background-color: #e63939;
+}
+.edit-button {
+  background-color: #8D7EFB;
+  color: white;
+}
+.edit-button:hover {
+  background-color: #7a6ae8;
+}
+.save-button {
+  background-color: #4CAF50;
+  color: white;
+}
+.save-button:hover {
+  background-color: #45a049;
+}
+
+/* --- Seção de Avaliação (ConsulCompleteDetails) --- */
+.doctor-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #d1c4e9;
+}
+.rating-title {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.3rem;
+}
+.doctor-rating-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  background-color: #8D7EFB;
+  padding: 25px;
+  border-radius: 15px;
+}
+.doctor-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-grow: 1;
+}
+.doctor-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid white;
+}
+.doctor-details h4 {
+  margin: 0;
+  color: white;
+  font-size: 1.3rem;
+}
+.doctor-details p {
+  margin: 5px 0 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+.rating-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 15px;
+}
+.stars {
+  display: flex;
+  gap: 10px;
+}
+.star-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: #e0e0e0;
+}
+.star-button.filled {
+  color: #FFD700;
+}
+.star {
+  font-size: 2rem;
+}
+.submit-rating {
+  background-color: white;
+  color: #8D7EFB;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.submit-rating:hover {
+  background-color: #f0f0f0;
+}
+.report-section {
+  text-align: center;
+  margin-top: 30px;
+}
+.report-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.report-button:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+  .doctor-rating-container {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  .rating-controls {
+    align-items: center;
+  }
+  .doctor-info {
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  .details-actions {
+    flex-direction: column-reverse; /* Botão "Voltar" fica por baixo */
+    gap: 10px;
+  }
+  .back-button, .remove-button, .decline-button, .edit-button, .save-button, .cancel-edit-button {
+    width: 100%;
+    box-sizing: border-box; /* Garante que o padding não estoure */
+  }
+  .pet-details-wrapper {
+    width: 95%;
+    padding: 20px 15px;
+  }
+  .pet-details-container {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+}

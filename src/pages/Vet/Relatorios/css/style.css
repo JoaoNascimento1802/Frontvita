@@ -1,0 +1,210 @@
+/* =================================================== */
+/* CSS ESPECÍFICO PARA RELATÓRIOS                      */
+/* =================================================== */
+
+/* Estilos gerais da página */
+.vet-page {
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.vet-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  padding-top: 150px;
+}
+
+/* Header da página */
+.vet-page-header {
+  margin-bottom: 40px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 20px;
+}
+
+.vet-page-header h1 { 
+  font-family: 'Poppins', sans-serif; 
+  font-size: 2.5rem; 
+  color: #333; 
+  margin: 0; 
+}
+
+.vet-page-header p { 
+  font-size: 1.1rem; 
+  color: #777; 
+  margin-top: 5px; 
+}
+
+/* Grid dos cards de estatísticas */
+.stats-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+/* Cards de estatísticas */
+.stat-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Ícones das estatísticas */
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.8rem;
+}
+
+.stat-icon.consultations { 
+  background: linear-gradient(135deg, #8D7EFB, #B77EFF); 
+}
+
+.stat-icon.new-patients { 
+  background: linear-gradient(135deg, #56ab2f, #a8e063); 
+}
+
+.stat-icon.performance { 
+  background: linear-gradient(135deg, #ff5f6d, #ffc371); 
+}
+
+/* Informações das estatísticas */
+.stat-info { 
+  display: flex; 
+  flex-direction: column; 
+}
+
+.stat-number { 
+  font-size: 2.2rem; 
+  font-weight: bold; 
+  color: #333; 
+  margin-bottom: 5px;
+}
+
+.stat-label { 
+  font-size: 1rem; 
+  color: #777; 
+}
+
+/* Seção de relatórios */
+.report-section {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  margin-bottom: 30px;
+}
+
+.report-section h3 { 
+  margin-top: 0; 
+  color: #333;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+}
+
+/* Gráfico mock */
+.mock-chart {
+  background-color: #f9f7ff;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 250px;
+  position: relative;
+}
+
+.bar {
+  width: 15%;
+  background-color: #B77EFF;
+  border-radius: 5px 5px 0 0;
+  position: relative;
+  text-align: center;
+  color: white;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 10px 5px;
+  font-weight: bold;
+  min-height: 40px;
+}
+
+.bar-label {
+  position: absolute;
+  bottom: -25px;
+  width: 100%;
+  left: 0;
+  color: #555;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Ações dos relatórios */
+.report-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.generate-report-button {
+  background-color: #8D7EFB;
+  color: white;
+  padding: 12px 35px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(141, 126, 251, 0.4);
+}
+
+.generate-report-button:hover {
+  background-color: #7a6ae8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(141, 126, 251, 0.5);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .stats-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card {
+    padding: 20px;
+  }
+  
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .stat-number {
+    font-size: 1.8rem;
+  }
+  
+  .mock-chart {
+    height: 200px;
+    padding: 15px;
+  }
+}

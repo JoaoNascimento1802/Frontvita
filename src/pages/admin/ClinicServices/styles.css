@@ -1,0 +1,244 @@
+/* Estilos para o cabeçalho da página */
+.admin-page-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #E5DBF7;
+    gap: 60px;
+}
+
+.admin-page-header h1 { 
+    font-family: 'Poppins', sans-serif; 
+    margin: 0;
+    font-size: 2rem;
+    color: #333;
+    flex: 1;
+    white-space: nowrap;
+}
+
+/* Estilo do botão Adicionar Novo */
+.add-new-button { 
+    background: linear-gradient(135deg, #B77EFF, #9D5AFF);
+    color: white; 
+    border: none; 
+    border-radius: 25px; 
+    padding: 13px 30px; 
+    font-weight: 700; 
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(183, 126, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.add-new-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.add-new-button:hover::before {
+    left: 100%;
+}
+
+.add-new-button:hover { 
+    background: linear-gradient(135deg, #9D5AFF, #8A4AFF);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(183, 126, 255, 0.4);
+}
+
+.add-new-button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(183, 126, 255, 0.4);
+}
+
+/* Estilos para a tabela */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    font-size: 0.9em;
+    font-family: 'Poppins', sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.styled-table thead tr {
+    background-color: #8D7EFB;
+    color: #ffffff;
+    text-align: left;
+    font-weight: bold;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #8D7EFB;
+}
+
+.action-cell {
+    display: flex;
+    gap: 10px;
+}
+
+/* Estilos para o formulário de edição/criação */
+.form-container {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(141, 126, 251, 0.15);
+    margin-bottom: 30px;
+    border: 1px solid rgba(141, 126, 251, 0.1);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-container h3 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, #8D7EFB 0%, #6B5CE7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-container .form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.form-container input, 
+.form-container textarea, 
+.form-container select {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 10px;
+    border: 2px solid #e8e8e8;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    flex: 1;
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.form-container input:focus, 
+.form-container textarea:focus,
+.form-container select:focus {
+    outline: none;
+    border-color: #8D7EFB;
+    box-shadow: 0 0 0 4px rgba(141, 126, 251, 0.1);
+    transform: translateY(-2px);
+}
+
+.form-container select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238D7EFB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 40px;
+}
+
+.form-container select:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.form-container textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.form-actions button {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel {
+    background-color: #f5f5f5;
+    color: #666;
+    border: 2px solid #e8e8e8 !important;
+}
+
+.btn-cancel:hover {
+    background-color: #e8e8e8;
+    color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-save {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.btn-save:active, .btn-cancel:active {
+    transform: translateY(0);
+}

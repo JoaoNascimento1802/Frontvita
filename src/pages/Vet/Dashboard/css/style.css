@@ -1,0 +1,123 @@
+/* =================================================== */
+/* CSS ESPECÍFICO PARA DASHBOARD                       */
+/* =================================================== */
+
+/* Estilos gerais da página */
+.vet-dashboard-page {
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.dashboard-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  padding-top: 150px;
+}
+
+/* Seção de boas-vindas */
+.welcome-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.welcome-text h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  color: #333;
+  margin: 0 0 20px 0;
+}
+
+.visualizar-button {
+  background-color: #B77EFF;
+  color: white;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(183, 126, 255, 0.3);
+}
+
+.visualizar-button:hover {
+  background-color: #9D5AFF;
+  transform: translateY(-2px);
+}
+
+/* Container dos cards */
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Estilos dos cards */
+.main-card, .small-card {
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.main-card:hover, .small-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card-image {
+  width: 100%;
+  display: block;
+}
+
+.card-footer {
+  background-color: white;
+  padding: 20px 25px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f0f0f0;
+}
+
+.notification-badge-card {
+  background-color: #ff6b6b;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+}
+
+.bottom-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .welcome-section {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+  .bottom-cards {
+    grid-template-columns: 1fr;
+  }
+  .welcome-text h1 {
+    font-size: 2rem;
+  }
+}

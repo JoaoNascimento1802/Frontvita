@@ -1,0 +1,24 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+}
+
+/* Layout principal */
+.page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: 110px; /* Adicionado para compensar o header fixo */
+}
+
+.page-content {
+    flex: 1;
+    padding: 20px;
+    margin-bottom: 40px; /* Espaço para o footer */
+}
