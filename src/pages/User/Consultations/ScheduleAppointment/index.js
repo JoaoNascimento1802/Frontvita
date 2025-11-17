@@ -22,7 +22,6 @@ const ScheduleAppointment = () => {
   const [allVets, setAllVets] = useState([]); 
   const [allMedicalServices, setAllMedicalServices] = useState([]);
   
-  // Estados para os dropdowns filtrados
   const [availableSpecialties, setAvailableSpecialties] = useState([]);
   const [filteredVets, setFilteredVets] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
@@ -58,14 +57,14 @@ const ScheduleAppointment = () => {
           setPets(petsResponse.data || []);
           
           // --- CORREÇÃO APLICADA AQUI ---
-          // A API retorna um array, não um objeto .content
+          // A API retorna um array (response.data), 
+          // não um objeto (response.data.content)
           setAllVets(vetsResponse.data || []);
           // --- FIM DA CORREÇÃO ---
           
           const medServices = servicesResponse.data.filter(s => s.medicalService === true);
           setAllMedicalServices(medServices || []);
 
-          // Usa a lista de especialidades estática para o filtro
           setAvailableSpecialties(specialityOptions);
           
         } catch (error) {
@@ -107,7 +106,6 @@ const ScheduleAppointment = () => {
     const { name, value } = e.target;
     let updatedFormData = { ...formData, [name]: value };
 
-    // Se o usuário mudar a ESPECIALIDADE
     if (name === 'specialityEnum') {
       const specialty = value;
 
@@ -125,7 +123,6 @@ const ScheduleAppointment = () => {
         setFilteredServices([]);
       }
       
-      // Reseta os campos dependentes
       updatedFormData.veterinarioId = '';
       updatedFormData.clinicServiceId = ''; 
       updatedFormData.consultationdate = '';
@@ -133,7 +130,6 @@ const ScheduleAppointment = () => {
       setAvailableTimes([]);
     }
     
-    // Se mudar o vet ou a data, reseta a hora
     if (name === 'veterinarioId' || name === 'consultationdate') {
       updatedFormData.consultationtime = ''; 
     }
@@ -198,7 +194,6 @@ const ScheduleAppointment = () => {
                 <label htmlFor="specialityEnum">Especialidade Desejada</label>
                 <select id="specialityEnum" name="specialityEnum" value={formData.specialityEnum} onChange={handleChange} required>
                   <option value="">Selecione uma especialidade</option>
-                  {/* Usa a lista de especialidades estática */}
                   {availableSpecialties.map(spec => (
                     <option key={spec} value={spec}>{spec.replace(/_/g, ' ')}</option>
                   ))}

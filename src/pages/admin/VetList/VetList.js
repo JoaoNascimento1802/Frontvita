@@ -22,19 +22,17 @@ const VetList = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedVet, setSelectedVet] = useState(null);
 
-    // Estados dos filtros
     const [nameFilter, setNameFilter] = useState('');
     const [specialtyFilter, setSpecialtyFilter] = useState('');
 
     const fetchVets = useCallback(async (query = {}) => {
         setLoading(true);
         try {
-            // A rota do Admin para listar vets é /admin/veterinarians
-            // A rota pública /veterinary/search também funciona
             const response = await api.get('/veterinary/search', { params: query });
             
             // --- CORREÇÃO APLICADA AQUI ---
-            // O backend envia um array, não um objeto .content
+            // A API retorna um array (response.data), 
+            // não um objeto (response.data.content) 
             setVets(response.data || []); 
             // -------------------------------
 
@@ -46,7 +44,7 @@ const VetList = () => {
     }, []);
 
     useEffect(() => {
-        fetchVets({}); // Busca todos os vets na montagem
+        fetchVets({}); // Busca todos na montagem
     }, [fetchVets]);
 
     const handleFilter = () => {
@@ -64,8 +62,7 @@ const VetList = () => {
     const handleDelete = async (vetId) => {
         if (window.confirm('Tem certeza que deseja excluir este veterinário? Esta ação é irreversível.')) {
             try {
-                // Rota correta do admin para deletar 
-                await api.delete(`/admin/veterinarians/${vetId}`); 
+                await api.delete(`/admin/veterinarians/${vetId}`);
                 fetchVets(); 
             } catch (error) {
                 alert('Erro ao excluir veterinário.');
@@ -120,7 +117,7 @@ const VetList = () => {
                                         src={vet.imageurl} 
                                         alt={vet.name} 
                                         className="vet-avatar" 
-                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://i.imgur.com/2qgrCI2.png'; }} // Fallback
+                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://i.imgur.com/2qgrCI2.png'; }}
                                     />
                                     <h4 className="vet-name">{vet.name}</h4>
                                     <p className="vet-specialty">{vet.specialityenum.replace(/_/g, " ")}</p>
