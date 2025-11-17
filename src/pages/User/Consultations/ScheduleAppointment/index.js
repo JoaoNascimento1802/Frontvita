@@ -1,4 +1,4 @@
-// src/pages/User/Consultations/ScheduleAppointment.js
+export default ScheduleAppointment;
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import HeaderComCadastro from '../../../../components/HeaderComCadastro';
@@ -8,12 +8,11 @@ import api from '../../../../services/api';
 import '../css/styles.css';
 import { toast } from 'react-toastify'; 
 
-// 1. Reutilizando a sua lista de especialidades, como solicitado.
 const specialityOptions = [
   "CLINICO_GERAL", "ANESTESIOLOGIA", "CARDIOLOGIA", "DERMATOLOGIA", "ENDOCRINOLOGIA", 
   "GASTROENTEROLOGIA", "NEUROLOGIA", "NUTRICAO", "OFTALMOLOGIA", "ONCOLOGIA", 
   "ORTOPEDIA", "REPRODUCAO_ANIMAL", "PATOLOGIA", "CIRURGIA_GERAL", "CIRURGIA_ORTOPEDICA", 
-  "ODONTOLOGIA", "ZOOTECNIA", "EXOTICOS", "ACUPUNTURA", "FISIOTERAPIA", "IMAGINOLOGIA"
+  "ODONTOLOGIA", "ZOOTECNIA", "EXOTICOS", "ACUPUNTURA", "FISIOTERAPia", "IMAGINOLOGIA"
 ];
 
 const ScheduleAppointment = () => {
@@ -21,19 +20,20 @@ const ScheduleAppointment = () => {
   const navigate = useNavigate();
   const [pets, setPets] = useState([]);
   const [allVets, setAllVets] = useState([]); 
-  const [allMedicalServices, setAllMedicalServices] = useState([]); // <-- Adicionado para buscar serviços
+  const [allMedicalServices, setAllMedicalServices] = useState([]);
   
   // Estados para os dropdowns filtrados
+  const [availableSpecialties, setAvailableSpecialties] = useState([]);
   const [filteredVets, setFilteredVets] = useState([]);
-  const [filteredServices, setFilteredServices] = useState([]); // <-- Adicionado para filtrar serviços
-
+  const [filteredServices, setFilteredServices] = useState([]);
+  
   const [availableTimes, setAvailableTimes] = useState([]);
   
   const [formData, setFormData] = useState({
     petId: '',
     veterinarioId: '',
-    clinicServiceId: '', // <-- Campo obrigatório para o DTO
-    specialityEnum: '', // Campo para controlar o filtro principal
+    clinicServiceId: '', 
+    specialityEnum: '', // NOVO CAMPO para controlar o filtro principal
     consultationdate: '',
     consultationtime: '',
     reason: '',
@@ -49,23 +49,25 @@ const ScheduleAppointment = () => {
       if (user?.id) {
         try {
           setError('');
-          // 2. Busca pets, todos os veterinários e todos os serviços
           const [petsResponse, vetsResponse, servicesResponse] = await Promise.all([
             api.get('/pets/my-pets'),
-            api.get('/veterinary/search'), // Usando a rota que busca todos os vets
+            api.get('/veterinary/search'), // Busca todos os vets
             api.get('/api/public/services') 
           ]);
 
           setPets(petsResponse.data || []);
           
-          // --- CORREÇÃO PRINCIPAL DO BUG ---
-          // A API /veterinary/search retorna um Array, não um objeto .content
-          setAllVets(vetsResponse.data || []); 
-          // ---------------------------------
+          // --- CORREÇÃO APLICADA AQUI ---
+          // A API retorna um array, não um objeto .content
+          setAllVets(vetsResponse.data || []);
+          // --- FIM DA CORREÇÃO ---
           
-          // Filtra para mostrar APENAS serviços médicos
           const medServices = servicesResponse.data.filter(s => s.medicalService === true);
           setAllMedicalServices(medServices || []);
+
+          // Cria uma lista única de especialidades disponíveis
+          const specialties = [...new Set(medServices.map(s => s.speciality))];
+          setAvailableSpecialties(specialties);
           
         } catch (error) {
           console.error("Erro ao buscar dados para agendamento:", error);
@@ -81,7 +83,6 @@ const ScheduleAppointment = () => {
     fetchData();
   }, [user, authLoading]);
 
-  // Busca horários disponíveis
   const fetchAvailableTimes = useCallback(async () => {
     if (formData.veterinarioId && formData.consultationdate) {
       try {
@@ -103,7 +104,6 @@ const ScheduleAppointment = () => {
     fetchAvailableTimes();
   }, [fetchAvailableTimes]);
 
-  // 3. Lógica de filtro reutilizada
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedFormData = { ...formData, [name]: value };
@@ -128,7 +128,7 @@ const ScheduleAppointment = () => {
       
       // Reseta os campos dependentes
       updatedFormData.veterinarioId = '';
-      updatedFormData.clinicServiceId = ''; // <-- Reseta serviço
+      updatedFormData.clinicServiceId = ''; 
       updatedFormData.consultationdate = '';
       updatedFormData.consultationtime = '';
       setAvailableTimes([]);
@@ -146,12 +146,11 @@ const ScheduleAppointment = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // 4. Garante que o clinicServiceId está sendo enviado
       const requestData = {
         petId: parseInt(formData.petId),
         veterinarioId: parseInt(formData.veterinarioId),
         usuarioId: user.id,
-        clinicServiceId: parseInt(formData.clinicServiceId), // <-- Corrigido
+        clinicServiceId: parseInt(formData.clinicServiceId), 
         consultationdate: formData.consultationdate,
         consultationtime: formData.consultationtime, 
         reason: formData.reason,
@@ -198,7 +197,6 @@ const ScheduleAppointment = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="specialityEnum">Especialidade Desejada</label>
-                {/* 5. Dropdown de especialidade usa a lista hardcoded (reutilizada) */}
                 <select id="specialityEnum" name="specialityEnum" value={formData.specialityEnum} onChange={handleChange} required>
                   <option value="">Selecione uma especialidade</option>
                   {specialityOptions.map(spec => (
@@ -217,7 +215,6 @@ const ScheduleAppointment = () => {
                 </select>
               </div>
 
-              {/* 6. Dropdown de Serviço (filtrado pela especialidade) */}
               <div className="form-group">
                 <label htmlFor="clinicServiceId">Tipo de Serviço</label>
                 <select id="clinicServiceId" name="clinicServiceId" value={formData.clinicServiceId} onChange={handleChange} required disabled={!formData.specialityEnum}>
@@ -226,7 +223,7 @@ const ScheduleAppointment = () => {
                 </select>
               </div>
             </div>
-
+            
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="consultationdate">Data</label>
@@ -266,5 +263,3 @@ const ScheduleAppointment = () => {
     </div>
   );
 };
-
-export default ScheduleAppointment;
