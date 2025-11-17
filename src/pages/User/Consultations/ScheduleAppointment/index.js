@@ -32,7 +32,7 @@ const ScheduleAppointment = () => {
     petId: '',
     veterinarioId: '',
     clinicServiceId: '', 
-    specialityEnum: '', // Campo para controlar o filtro principal
+    specialityEnum: '', 
     consultationdate: '',
     consultationtime: '',
     reason: '',
@@ -56,11 +56,10 @@ const ScheduleAppointment = () => {
 
           setPets(petsResponse.data || []);
           
-          // --- CORREÇÃO APLICADA AQUI ---
+          // --- CORREÇÃO 1: Carregamento de dados ---
           // A API retorna um array (response.data), 
           // não um objeto (response.data.content)
           setAllVets(vetsResponse.data || []);
-          // --- FIM DA CORREÇÃO ---
           
           const medServices = servicesResponse.data.filter(s => s.medicalService === true);
           setAllMedicalServices(medServices || []);
@@ -110,11 +109,11 @@ const ScheduleAppointment = () => {
       const specialty = value;
 
       if (specialty) {
-        // Filtra veterinários por essa especialidade
-        const vetsWithSpecialty = allVets.filter(vet => vet.specialityenum === specialty);
+        // --- CORREÇÃO 2: Verificação de Nulo ---
+        // Adiciona "vet.specialityenum &&" para evitar crash
+        const vetsWithSpecialty = allVets.filter(vet => vet.specialityenum && vet.specialityenum === specialty);
         setFilteredVets(vetsWithSpecialty);
 
-        // Filtra serviços por essa especialidade
         const servicesWithSpecialty = allMedicalServices.filter(s => s.speciality === specialty);
         setFilteredServices(servicesWithSpecialty);
 

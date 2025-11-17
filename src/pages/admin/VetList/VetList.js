@@ -31,11 +31,9 @@ const VetList = () => {
         try {
             const response = await api.get('/veterinary/search', { params: query });
             
-            // --- CORREÇÃO APLICADA AQUI ---
-            // A API retorna um array (response.data), 
-            // não um objeto (response.data.content) 
+            // --- CORREÇÃO 1: Carregamento de dados ---
+            // A API retorna um array, não um objeto .content 
             setVets(response.data || []); 
-            // -------------------------------
 
         } catch (error) {
             setError('Falha ao carregar veterinários.');
@@ -118,10 +116,15 @@ const VetList = () => {
                                         src={vet.imageurl} 
                                         alt={vet.name} 
                                         className="vet-avatar" 
-                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://i.imgur.com/2qgrCI2.png'; }} // Fallback
+                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://i.imgur.com/2qgrCI2.png'; }}
                                     />
                                     <h4 className="vet-name">{vet.name}</h4>
-                                    <p className="vet-specialty">{vet.specialityenum.replace(/_/g, " ")}</p>
+                                    
+                                    {/* --- CORREÇÃO 2: Verificação de Nulo --- */}
+                                    <p className="vet-specialty">
+                                        {(vet.specialityenum || 'N/A').replace(/_/g, " ")}
+                                    </p>
+                                    
                                     <p className="vet-info">{vet.email}</p>
                                     <p className="vet-info">{vet.phone}</p>
                                     <p className="vet-info">CRMV: {vet.crmv}</p>
