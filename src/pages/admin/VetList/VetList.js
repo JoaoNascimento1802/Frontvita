@@ -22,6 +22,7 @@ const VetList = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedVet, setSelectedVet] = useState(null);
 
+    // Estados dos filtros
     const [nameFilter, setNameFilter] = useState('');
     const [specialtyFilter, setSpecialtyFilter] = useState('');
 
@@ -117,7 +118,7 @@ const VetList = () => {
                                         src={vet.imageurl} 
                                         alt={vet.name} 
                                         className="vet-avatar" 
-                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://i.imgur.com/2qgrCI2.png'; }}
+                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://i.imgur.com/2qgrCI2.png'; }} // Fallback
                                     />
                                     <h4 className="vet-name">{vet.name}</h4>
                                     <p className="vet-specialty">{vet.specialityenum.replace(/_/g, " ")}</p>
