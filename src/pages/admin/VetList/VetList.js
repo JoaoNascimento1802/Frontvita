@@ -29,11 +29,12 @@ const VetList = () => {
     const fetchVets = useCallback(async (query = {}) => {
         setLoading(true);
         try {
+            // A rota do Admin para listar vets é /admin/veterinarians
+            // A rota pública /veterinary/search também funciona
             const response = await api.get('/veterinary/search', { params: query });
             
             // --- CORREÇÃO APLICADA AQUI ---
-            // A API retorna um array (response.data), 
-            // não um objeto de página (response.data.content).
+            // O backend envia um array, não um objeto .content
             setVets(response.data || []); 
             // -------------------------------
 
@@ -45,8 +46,7 @@ const VetList = () => {
     }, []);
 
     useEffect(() => {
-        // Objeto de query vazio para garantir que a busca inicial traga todos
-        fetchVets({}); 
+        fetchVets({}); // Busca todos os vets na montagem
     }, [fetchVets]);
 
     const handleFilter = () => {
@@ -64,7 +64,8 @@ const VetList = () => {
     const handleDelete = async (vetId) => {
         if (window.confirm('Tem certeza que deseja excluir este veterinário? Esta ação é irreversível.')) {
             try {
-                await api.delete(`/admin/veterinarians/${vetId}`);
+                // Rota correta do admin para deletar 
+                await api.delete(`/admin/veterinarians/${vetId}`); 
                 fetchVets(); 
             } catch (error) {
                 alert('Erro ao excluir veterinário.');
@@ -110,26 +111,30 @@ const VetList = () => {
                 
                 {!loading && !error && (
                     <div className="admin-card-grid">
-                        {vets.map(vet => (
-                            <div key={vet.id} className="vet-card">
-                                <img 
-                                    src={vet.imageurl} 
-                                    alt={vet.name} 
-                                    className="vet-avatar" 
-                                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://i.imgur.com/2qgrCI2.png'; }} // Fallback
-                                />
-                                <h4 className="vet-name">{vet.name}</h4>
-                                <p className="vet-specialty">{vet.specialityenum.replace(/_/g, " ")}</p>
-                                <p className="vet-info">{vet.email}</p>
-                                <p className="vet-info">{vet.phone}</p>
-                                <p className="vet-info">CRMV: {vet.crmv}</p>
-                                
-                                <div className="card-actions">
-                                    <button className="action-button edit" onClick={() => handleEdit(vet)}>Editar</button>
-                                    <button className="action-button delete" onClick={() => handleDelete(vet.id)}>Excluir</button>
+                        {vets.length === 0 ? (
+                            <p>Nenhum veterinário encontrado.</p>
+                        ) : (
+                            vets.map(vet => (
+                                <div key={vet.id} className="vet-card">
+                                    <img 
+                                        src={vet.imageurl} 
+                                        alt={vet.name} 
+                                        className="vet-avatar" 
+                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://i.imgur.com/2qgrCI2.png'; }} // Fallback
+                                    />
+                                    <h4 className="vet-name">{vet.name}</h4>
+                                    <p className="vet-specialty">{vet.specialityenum.replace(/_/g, " ")}</p>
+                                    <p className="vet-info">{vet.email}</p>
+                                    <p className="vet-info">{vet.phone}</p>
+                                    <p className="vet-info">CRMV: {vet.crmv}</p>
+                                    
+                                    <div className="card-actions">
+                                        <button className="action-button edit" onClick={() => handleEdit(vet)}>Editar</button>
+                                        <button className="action-button delete" onClick={() => handleDelete(vet.id)}>Excluir</button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
                 )}
             </main>
