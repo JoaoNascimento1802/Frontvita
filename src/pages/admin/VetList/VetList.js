@@ -1,3 +1,4 @@
+// src/pages/admin/VetList/VetList.js
 import React, { useState, useEffect, useCallback } from 'react';
 import HeaderAdmin from '../../../components/HeaderAdmin/HeaderAdmin';
 import Footer from '../../../components/Footer';
@@ -31,8 +32,9 @@ const VetList = () => {
             const response = await api.get('/veterinary/search', { params: query });
             
             // --- CORREÇÃO APLICADA AQUI ---
-            // A API retorna um array, não um objeto paginado
-            setVets(response.data); 
+            // A API retorna um array (response.data), 
+            // não um objeto de página (response.data.content).
+            setVets(response.data || []); 
             // -------------------------------
 
         } catch (error) {
@@ -43,7 +45,8 @@ const VetList = () => {
     }, []);
 
     useEffect(() => {
-        fetchVets(); 
+        // Objeto de query vazio para garantir que a busca inicial traga todos
+        fetchVets({}); 
     }, [fetchVets]);
 
     const handleFilter = () => {

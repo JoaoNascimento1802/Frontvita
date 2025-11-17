@@ -1,4 +1,4 @@
-export default ScheduleAppointment;
+// src/pages/User/Consultations/ScheduleAppointment.js
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import HeaderComCadastro from '../../../../components/HeaderComCadastro';
@@ -12,7 +12,7 @@ const specialityOptions = [
   "CLINICO_GERAL", "ANESTESIOLOGIA", "CARDIOLOGIA", "DERMATOLOGIA", "ENDOCRINOLOGIA", 
   "GASTROENTEROLOGIA", "NEUROLOGIA", "NUTRICAO", "OFTALMOLOGIA", "ONCOLOGIA", 
   "ORTOPEDIA", "REPRODUCAO_ANIMAL", "PATOLOGIA", "CIRURGIA_GERAL", "CIRURGIA_ORTOPEDICA", 
-  "ODONTOLOGIA", "ZOOTECNIA", "EXOTICOS", "ACUPUNTURA", "FISIOTERAPia", "IMAGINOLOGIA"
+  "ODONTOLOGIA", "ZOOTECNIA", "EXOTICOS", "ACUPUNTURA", "FISIOTERAPIA", "IMAGINOLOGIA"
 ];
 
 const ScheduleAppointment = () => {
@@ -33,7 +33,7 @@ const ScheduleAppointment = () => {
     petId: '',
     veterinarioId: '',
     clinicServiceId: '', 
-    specialityEnum: '', // NOVO CAMPO para controlar o filtro principal
+    specialityEnum: '', // Campo para controlar o filtro principal
     consultationdate: '',
     consultationtime: '',
     reason: '',
@@ -65,9 +65,8 @@ const ScheduleAppointment = () => {
           const medServices = servicesResponse.data.filter(s => s.medicalService === true);
           setAllMedicalServices(medServices || []);
 
-          // Cria uma lista única de especialidades disponíveis
-          const specialties = [...new Set(medServices.map(s => s.speciality))];
-          setAvailableSpecialties(specialties);
+          // Usa a lista de especialidades estática para o filtro
+          setAvailableSpecialties(specialityOptions);
           
         } catch (error) {
           console.error("Erro ao buscar dados para agendamento:", error);
@@ -199,7 +198,8 @@ const ScheduleAppointment = () => {
                 <label htmlFor="specialityEnum">Especialidade Desejada</label>
                 <select id="specialityEnum" name="specialityEnum" value={formData.specialityEnum} onChange={handleChange} required>
                   <option value="">Selecione uma especialidade</option>
-                  {specialityOptions.map(spec => (
+                  {/* Usa a lista de especialidades estática */}
+                  {availableSpecialties.map(spec => (
                     <option key={spec} value={spec}>{spec.replace(/_/g, ' ')}</option>
                   ))}
                 </select>
@@ -263,3 +263,5 @@ const ScheduleAppointment = () => {
     </div>
   );
 };
+
+export default ScheduleAppointment;
