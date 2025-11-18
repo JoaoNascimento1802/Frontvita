@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import api from '../../../services/api';
 import './css/VetList.css';
-import profileIcon from '../../../assets/images/Header/perfilIcon.png'; // Importar ícone padrão
+import profileIcon from '../../../assets/images/Header/perfilIcon.png';
 
 const specialityOptions = [
     "CLINICO_GERAL", "ANESTESIOLOGIA", "CARDIOLOGIA", "DERMATOLOGIA", "ENDOCRINOLOGIA",
@@ -14,10 +14,10 @@ const specialityOptions = [
 const AddVetModal = ({ onClose, onVetAdded }) => {
     const [formData, setFormData] = useState({
         name: '', email: '', password: '', crmv: '', rg: '',
-        specialityenum: '', phone: '', imageurl: '',
+        specialityenum: 'CLINICO_GERAL', phone: '', imageurl: '',
     });
     const [imageFile, setImageFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(profileIcon); // CORREÇÃO: Usar ícone padrão
+    const [imagePreview, setImagePreview] = useState(profileIcon);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -39,77 +39,34 @@ const AddVetModal = ({ onClose, onVetAdded }) => {
         setLoading(true);
         setError('');
         try {
-            // 1. Criar o usuário (backend define a role VETERINARY)
+            // 1. Criar o usuário (Envia o CRMV aqui!)
             const userResponse = await api.post('/admin/users', {
                 username: formData.name,
                 email: formData.email,
                 password: formData.password,
                 phone: formData.phone,
-                address: "Endereço Padrão (Admin)", 
+                address: "Endereço Padrão (Admin)",
                 rg: formData.rg,
-                imageurl: '', // Backend usará o default
+                // --- IMPORTANTE: Enviando o CRMV para a API ---
+                crmv: formData.crmv, 
+                // ----------------------------------------------
+                imageurl: '', 
                 role: 'VETERINARY'
             });
             
-            // 2. Criar o perfil veterinário (usando a rota /veterinary original)
-            const vetData = {
-                name: formData.name,
-                email: formData.email, // O DTO /veterinary ainda espera email/password
-                password: formData.password,
-                crmv: formData.crmv,
-                rg: formData.rg,
-                specialityenum: formData.specialityenum,
-                phone: formData.phone,
-                imageurl: '', // Backend usará o default
-            };
+            // Se a criação do usuário tiver sucesso, o UserService agora cria o perfil Vet automaticamente
+            // com o CRMV correto. Não precisamos chamar /veterinary manualmente.
             
-            // Nota: O backend precisa ser ajustado para linkar o userAccount na rota POST /veterinary
-            // ou a rota POST /veterinary deve ser removida em favor de POST /admin/users
-            // Por enquanto, vamos assumir que o /admin/users é suficiente.
-            
-            // Se o seu backend CRIA O VETERINÁRIO automaticamente ao criar o USUÁRIO VETERINÁRIO:
-             const newVetId = userResponse.data.id; // Isto está errado, o ID do Vet não é o ID do User
-             // Precisamos de uma forma de obter o ID do Vet. 
-             // Vamos assumir que o backend foi corrigido e /admin/users (VETERINARY) cria ambos.
-             // E que o /upload/veterinary/ deve usar o ID DO USUÁRIO.
-             
-             // --- Tentativa de correção ---
-             // Vamos assumir que o /admin/users retorna o UserResponseDTO
-             // E que o /upload/veterinary/ precisa do ID DO VETERINÁRIO, não do usuário.
-             // O fluxo está quebrado.
-             
-             // Vamos simplificar: A rota /veterinary (pública) cria o USER e o VET
-             // A rota /admin/users (admin) cria o USER (e o VET/SCHEDULE)
-             
-             // Vamos usar a rota /admin/users que é mais completa
-             
-            const newUser = userResponse.data; // Este é o UserResponseDTO
+            const newUser = userResponse.data;
 
-            // 3. Fazer upload da imagem (se houver)
+            // 2. Fazer upload da imagem (se houver)
             if (imageFile) {
-                const uploadFormData = new FormData();
+                // Busca o VetID para fazer o upload da imagem no perfil correto
+                // Como o backend cria o vet automaticamente, precisamos descobrir o ID dele ou usar o ID do usuário se a rota permitir
+                // Assumindo que o upload/user funciona para o avatar do usuário:
+                 const uploadFormData = new FormData();
                 uploadFormData.append('file', imageFile);
-                // Precisamos do ID do VETERINÁRIO, não do usuário.
-                // Vamos assumir que o backend /admin/users não cria o VET, só o USER
-                // Vamos reverter e usar a rota POST /veterinary
-                
-                // --- REVERTENDO A LÓGICA ---
-                setLoading(true);
-                setError('');
-                
-                const vetPayload = {
-                    ...formData,
-                    imageurl: '' // Backend define o padrão
-                };
-                
-                const response = await api.post('/veterinary', vetPayload);
-                const newVet = response.data; // Isto é VeterinaryResponseDTO
-
-                if (imageFile) {
-                    const uploadFormData = new FormData();
-                    uploadFormData.append('file', imageFile);
-                    await api.post(`/upload/veterinary/${newVet.id}`, uploadFormData);
-                }
+                await api.post(`/upload/user/${newUser.id}`, uploadFormData);
             }
             
             alert('Veterinário cadastrado com sucesso!');
@@ -117,6 +74,7 @@ const AddVetModal = ({ onClose, onVetAdded }) => {
         } catch (err) {
             const errorMsg = err.response?.data?.message || "Erro ao cadastrar veterinário.";
             setError(errorMsg);
+            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -137,13 +95,15 @@ const AddVetModal = ({ onClose, onVetAdded }) => {
                     <div className="form-group-modal"><label>Nome Completo</label><input type="text" name="name" required onChange={handleChange} /></div>
                      <div className="form-group-modal"><label>Email</label><input type="email" name="email" required onChange={handleChange} /></div>
                     <div className="form-group-modal"><label>Senha Provisória</label><input type="password" name="password" required onChange={handleChange} /></div>
-                    <div className="form-group-modal"><label>CRMV</label><input type="text" name="crmv" required onChange={handleChange} /></div>
+                    
+                    {/* Campo CRMV */}
+                    <div className="form-group-modal"><label>CRMV</label><input type="text" name="crmv" required onChange={handleChange} placeholder="Ex: SP-12345" /></div>
+                    
                      <div className="form-group-modal"><label>RG</label><input type="text" name="rg" required onChange={handleChange} /></div>
                     <div className="form-group-modal"><label>Telefone</label><input type="tel" name="phone" required onChange={handleChange} /></div>
                     <div className="form-group-modal">
                          <label>Especialidade</label>
                         <select name="specialityenum" required onChange={handleChange} value={formData.specialityenum}>
-                            <option value="">Selecione...</option>
                              {specialityOptions.map(spec => (
                                 <option key={spec} value={spec}>{spec.replace(/_/g, " ")}</option>
                              ))}

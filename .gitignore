@@ -1,6 +1,5 @@
 # Arquivo de segredos
 .env
-
 # Dependências
 /node_modules/
 

@@ -1,196 +1,164 @@
-/* Estilos Gerais da Página de Lista */
-.admin-page { 
-  background-color: #f9f9f9; 
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-.admin-content { 
-  max-width: 1200px; 
-  margin: 0 auto; 
-  padding: 20px; 
-  padding-top: 150px;
-  flex: 1;
-  padding-bottom: 60px;
-}
-.admin-page-header { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  margin-bottom: 40px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #E5DBF7;
-  gap: 60px;
-}
-.admin-page-header h1 { 
-  font-family: 'Poppins', sans-serif; 
-  margin: 0;
-  font-size: 2rem;
-  color: #333;
-  flex: 1;
-  white-space: nowrap;
-}
-.add-new-button { 
-  background: linear-gradient(135deg, #B77EFF, #9D5AFF);
-  color: white; 
-  border: none; 
-  border-radius: 25px; 
-  padding: 13px 30px; 
-  font-weight: 700; 
-  font-size: 15px;
-  font-family: 'Poppins', sans-serif; 
-  cursor: pointer; 
-  display: flex; 
-  align-items: center; 
-  gap: 8px; 
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(183, 126, 255, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-.add-new-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
-}
-.add-new-button:hover::before {
-  left: 100%;
-}
-.add-new-button:hover { 
-  background: linear-gradient(135deg, #9D5AFF, #8A4AFF);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(183, 126, 255, 0.4);
-}
-.add-new-button:active {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(183, 126, 255, 0.4);
-}
+/* src/pages/admin/VetList/css/VetList.css */
 
-/* Filtros */
-.admin-filters { 
-  display: flex; 
-  flex-wrap: wrap; 
-  gap: 15px; 
-  margin-bottom: 30px; 
-  background-color: #fff; 
-  padding: 25px; 
-  border-radius: 12px; 
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-  min-height: 80px;
-}
-.admin-filters input, .admin-filters select { padding: 12px 15px; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem; font-family: 'Poppins', sans-serif; color: #555; flex: 1; min-width: 200px; transition: all 0.2s ease-in-out; }
-.admin-filters input:focus, .admin-filters select:focus { outline: none; border-color: #B77EFF; box-shadow: 0 0 0 3px rgba(183, 126, 255, 0.2); }
-.search-bar { 
-  position: relative; 
-  display: flex; 
-  align-items: center; 
-  flex: 3;
-  min-width: 400px;
-  max-width: 100%;
-}
-.search-bar .search-icon { position: absolute; left: 12px; color: #aaa; font-size: 1rem; z-index: 1; }
-.search-bar input { padding-left: 45px; width: 100%; }
-
-/* Cards de Gerenciamento */
-.admin-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
-.admin-card { background-color: #fff; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.07); display: flex; flex-direction: column; overflow: hidden; }
-.card-header-admin { display: flex; align-items: center; gap: 15px; padding: 20px; border-bottom: 1px solid #f0f0f0; }
-.card-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
-.card-title { font-size: 1.2rem; font-weight: 700; color: #333; }
-.card-body-admin { padding: 20px; flex-grow: 1; }
-.card-body-admin p { margin: 0 0 12px 0; color: #555; }
-.card-body-admin p:last-child { margin-bottom: 0; }
-.card-body-admin p strong { color: #333; }
-.card-actions-admin { display: flex; gap: 10px; padding: 0 20px 20px 20px; margin-top: auto; border-top: 1px solid #f0f0f0; padding-top: 20px; }
-.action-button-card { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 0.9rem; cursor: pointer; text-align: center; text-decoration: none; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.action-button-card.edit { background-color: #8D7EFB; color: white; }
-.action-button-card.delete { background-color: #f44336; color: white; }
-.action-button-card.save { background-color: #4CAF50; color: white; }
-.action-button-card.cancel { background-color: #777; color: white; }
-.form-group-card { display: flex; flex-direction: column; margin-bottom: 15px; }
-.form-group-card label { margin-bottom: 5px; font-weight: 600; color: #555; font-size: 0.9rem; }
-.card-input { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem; box-sizing: border-box; font-family: 'Poppins', sans-serif; color: #555; transition: all 0.2s ease-in-out; }
-.card-input:focus { outline: none; border-color: #B77EFF; box-shadow: 0 0 0 3px rgba(183, 126, 255, 0.2); }
-.status-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: white; }
-.status-badge.agendada { background-color: #007bff; }
-.status-badge.pendente { background-color: #ffc107; color: #333; }
-.status-badge.concluída { background-color: #28a745; }
-.status-badge.cancelada { background-color: #f44336; }
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
+.admin-page {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f4f6f8;
 }
 
-.modal-content {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-}
-
-.modal-content h2 {
-    margin-top: 0;
-    font-family: 'Poppins', sans-serif;
-}
-
-.form-group-modal {
-    margin-bottom: 15px;
-}
-
-.form-group-modal label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: #555;
-}
-
-.form-group-modal input,
-.form-group-modal select {
+.admin-content {
+    flex: 1;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
     box-sizing: border-box;
 }
 
-.modal-actions {
+.admin-page-header {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
 }
 
-.modal-actions button {
-    padding: 10px 20px;
+.admin-page-header h1 {
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+    margin: 0;
+}
+
+.add-new-button {
+    background-color: #8D7EFB;
+    color: white;
     border: none;
+    padding: 12px 24px;
     border-radius: 8px;
-    font-weight: bold;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.add-new-button:hover {
+    background-color: #7a6ae8;
+}
+
+.admin-filters {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.admin-filters input, 
+.admin-filters select {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.admin-filters button {
+    padding: 10px 25px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
 }
 
-.btn-cancel {
-    background-color: #f1f1f1;
-    color: #333;
+/* --- GRID E CARDS CORRIGIDOS --- */
+
+.admin-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
 }
 
-.btn-save {
-    background-color: #4CAF50;
-    color: white;
+.vet-card {
+    background-color: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza tudo horizontalmente */
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.vet-card:hover {
+    transform: translateY(-5px);
+}
+
+/* --- CORREÇÃO DA IMAGEM --- */
+.vet-avatar {
+    width: 100px;  /* Largura fixa */
+    height: 100px; /* Altura fixa */
+    border-radius: 50%; /* Torna redonda */
+    object-fit: cover; /* Corta a imagem para caber sem esticar */
+    border: 3px solid #EBE4F4; /* Borda roxa clara */
+    margin-bottom: 15px;
+    background-color: #f0f0f0; /* Cor de fundo enquanto carrega */
+}
+
+.vet-name {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 10px 0 5px 0;
+    font-weight: 700;
+}
+
+.vet-specialty {
+    color: #8D7EFB;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vet-info {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 3px 0;
+}
+
+.card-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+}
+
+.action-button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    flex: 1;
+}
+
+.action-button.edit {
+    background-color: #EBE4F4;
+    color: #8D7EFB;
+}
+
+.action-button.delete {
+    background-color: #ffe5e5;
+    color: #ff4d4d;
+}
+
+.action-button:hover {
+    opacity: 0.8;
 }
