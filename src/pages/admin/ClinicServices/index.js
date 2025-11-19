@@ -6,6 +6,7 @@ import api from '../../../services/api';
 import { FaEdit, FaTrash, FaPlus, FaSave, FaTimes } from 'react-icons/fa';
 import './styles.css';
 import { toast } from 'react-toastify';
+import { formatEnumLabel } from '../../../utils/format';
 
 const specialityOptions = [
     "CLINICO_GERAL", "ANESTESIOLOGIA", "CARDIOLOGIA", "DERMATOLOGIA", "ENDOCRINOLOGIA",
@@ -162,7 +163,7 @@ const ClinicServices = () => {
                                  ) : (
                                     // Mapeia todas as opções exceto Estética
                                     specialityOptions.map(spec => (
-                                        spec !== 'ESTETICA' && <option key={spec} value={spec}>{spec.replace(/_/g, " ")}</option>
+                                        spec !== 'ESTETICA' && <option key={spec} value={spec}>{formatEnumLabel(spec)}</option>
                                     ))
                                  )}
                                 </select>

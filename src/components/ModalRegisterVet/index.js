@@ -107,8 +107,14 @@ const ModalRegisterVet = ({ onClose, switchToUser, openLogin, onRegisterSuccess 
 
   return (
     <div className="modal active" onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-        <span className="close" onClick={onClose}>&times;</span>
+      <div
+        className="modal-container"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-register-vet-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="close" type="button" aria-label="Fechar" onClick={onClose}>&times;</button>
         
         <div className="button-group">
           <button className="button" onClick={switchToUser}>Cliente</button>
@@ -118,9 +124,10 @@ const ModalRegisterVet = ({ onClose, switchToUser, openLogin, onRegisterSuccess 
         <div className="logo-modal">
           <img src={logo} alt="Pet Vita Logo" />
         </div>
+        <h2 id="modal-register-vet-title" style={{ textAlign: 'center' }}>Cadastro de Veterinário</h2>
         
         <form className="form" onSubmit={handleRegister}>
-          {error && <div className="error-message">{error}</div>}
+          {error && <div className="error-message" role="alert" aria-live="assertive">{error}</div>}
           
           <div className="input-group">
             <label htmlFor="username">Nome Completo</label>

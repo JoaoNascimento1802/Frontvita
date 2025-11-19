@@ -29,8 +29,14 @@ const ModalVet = ({ onClose, switchToUser, switchToRegisterVet, onLoginSuccess, 
 
   return (
     <div className="modal active" onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-        <span className="close" onClick={onClose}>&times;</span>
+      <div
+        className="modal-container"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-vet-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="close" type="button" aria-label="Fechar" onClick={onClose}>&times;</button>
         <div className="button-group">
           <button className="button" onClick={switchToUser}>Cliente</button>
           <button className="button active">Veterinário</button>
@@ -38,9 +44,10 @@ const ModalVet = ({ onClose, switchToUser, switchToRegisterVet, onLoginSuccess, 
         <div className="logo-modal">
           <img src={logo} alt="Pet Vita Logo" />
         </div>
+        <h2 id="modal-vet-title" style={{ textAlign: 'center' }}>Login do Veterinário</h2>
         
         <form className="form" onSubmit={handleSubmit}>
-          {error && <p className="error-message">{error}</p>}
+          {error && <p className="error-message" role="alert" aria-live="assertive">{error}</p>}
           <div className="input-group">
             <label htmlFor="CRMV">CRMV</label>
             <input 

@@ -7,6 +7,7 @@ import { useAuth } from '../../../../context/AuthContext';
 import api from '../../../../services/api';
 import '../css/styles.css';
 import { toast } from 'react-toastify'; 
+import { formatEnumLabel } from '../../../../utils/format';
 
 const specialityOptions = [
   "CLINICO_GERAL", "ANESTESIOLOGIA", "CARDIOLOGIA", "DERMATOLOGIA", "ENDOCRINOLOGIA", 
@@ -194,7 +195,7 @@ const ScheduleAppointment = () => {
                 <select id="specialityEnum" name="specialityEnum" value={formData.specialityEnum} onChange={handleChange} required>
                   <option value="">Selecione uma especialidade</option>
                   {availableSpecialties.map(spec => (
-                    <option key={spec} value={spec}>{spec.replace(/_/g, ' ')}</option>
+                    <option key={spec} value={spec}>{formatEnumLabel(spec)}</option>
                   ))}
                 </select>
               </div>

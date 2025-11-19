@@ -7,6 +7,7 @@ import api from '../../../../services/api';
 import { useAuth } from '../../../../context/AuthContext';
 import { FaStar, FaRegStar } from 'react-icons/fa';
 import '../css/styles.css'; 
+import { formatEnumLabel } from '../../../../utils/format';
 import profileIcon from '../../../../assets/images/Perfil/perfilIcon.png';
 
 const ConsulCompleteDetails = () => {
@@ -114,7 +115,7 @@ const ConsulCompleteDetails = () => {
                                  <img src={consulta?.doctorImageUrl || profileIcon} alt={consulta?.veterinaryName} className="doctor-avatar"/>
                                 <div className="doctor-details">
                                      <h4>{consulta?.veterinaryName}</h4>
-                                    <p>{consulta?.speciality.replace(/_/g, " ")}</p>
+                                    <p>{formatEnumLabel(consulta?.speciality)}</p>
                                  </div>
                             </div>
                             <div className="rating-controls">

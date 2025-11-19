@@ -9,6 +9,7 @@ import ImageCropper from '../../../../components/ImageCropper/ImageCropper'; // 
 import { FaPencilAlt } from 'react-icons/fa'; // Importar Ícone
 import profileIcon from '../../../../assets/images/Header/perfilIcon.png'; // Importar ícone padrão
 import './css/styles.css';
+import { formatEnumLabel } from '../../../../utils/format';
 
 // Enums e Constantes
 const speciesOptions = [ "CACHORRO", "GATO", "PASSARO", "PEIXE", "ROEDOR", "REPTIL", "COELHO", "OUTROS" ];
@@ -277,26 +278,26 @@ const PetsDetails = () => {
                                 <div className="profile-field">
                                      <label>Espécie</label>
                                     {isEditing ? (
-                                         <select name="speciespet" value={editData.speciespet} onChange={handleInputChange} className="info-field editable">
-                                            {speciesOptions.map(s => <option key={s} value={s}>{s}</option>)}
+                                        <select name="speciespet" value={editData.speciespet} onChange={handleInputChange} className="info-field editable">
+                                            {speciesOptions.map(s => <option key={s} value={s}>{formatEnumLabel(s)}</option>)}
                                         </select>
-                                     ) : <div className="info-field">{petData.speciespet}</div>}
+                                    ) : <div className="info-field">{formatEnumLabel(petData.speciespet)}</div>}
                                 </div>
                                 {isEditing ? renderBreedSelector() : (
                                      <div className="profile-field">
                                         <label>Raça</label>
                                          <div className="info-field">
-                                            {(
+                                            {formatEnumLabel(
                                                 petData.personalizedBreed || 
-                                                 petData.dogBreed || 
+                                                petData.dogBreed || 
                                                 petData.catBreed || 
                                                 petData.birdBreed || 
-                                                 petData.fishBreed || 
+                                                petData.fishBreed || 
                                                 petData.rodentBreed || 
-                                                 petData.reptileBreed || 
-                                                 petData.rabbitBreed || 
+                                                petData.reptileBreed || 
+                                                petData.rabbitBreed || 
                                                 'Não especificada'
-                                            ).replace(/_/g, ' ')}
+                                            )}
                                          </div>
                                     </div>
                                 )}
@@ -306,9 +307,9 @@ const PetsDetails = () => {
                                     <label>Porte</label>
                                     {isEditing ? (
                                         <select name="porte" value={editData.porte} onChange={handleInputChange} className="info-field editable">
-                                             {porteOptions.map(p => <option key={p} value={p}>{p}</option>)}
+                                            {porteOptions.map(p => <option key={p} value={p}>{formatEnumLabel(p)}</option>)}
                                         </select>
-                                     ) : <div className="info-field">{petData.porte}</div>}
+                                    ) : <div className="info-field">{formatEnumLabel(petData.porte)}</div>}
                                 </div>
                                   <div className="profile-field">
                                     <label>Gênero</label>
@@ -316,7 +317,7 @@ const PetsDetails = () => {
                                         <select name="gender" value={editData.gender} onChange={handleInputChange} className="info-field editable">
                                              {genderOptions.map(g => <option key={g} value={g}>{g}</option>)}
                                         </select>
-                                     ) : <div className="info-field">{petData.gender}</div>}
+                                    ) : <div className="info-field">{formatEnumLabel(petData.gender)}</div>}
                                 </div>
                              </div>
                             <div className="profile-actions">

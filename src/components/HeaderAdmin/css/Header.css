@@ -71,6 +71,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 .header-icon:hover {
   color: #B77EFF;
@@ -106,8 +109,10 @@
   cursor: pointer;
   width: 48px;
   height: 48px;
+  aspect-ratio: 1 / 1;
 }
 .profile-icon img {
+  display: block;
   width: 100%;
   height: 100%;
   border-radius: 50%;

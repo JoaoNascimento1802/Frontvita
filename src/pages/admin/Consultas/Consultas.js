@@ -6,6 +6,7 @@ import api from '../../../services/api';
 import { FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
 import './css/Consultas.css';
 import { toast } from 'react-toastify';
+import { formatEnumLabel } from '../../../utils/format';
 
 // Lista de especialidades (agora inclui Estética)
 const specialityLabels = [
@@ -52,7 +53,7 @@ const Consultas = () => {
                 petName: c.petName,
                 clientName: c.userName,
                 professionalName: c.veterinaryName,
-                displayName: (c.speciality || "N/A").replace(/_/g, " "), // Nome de exibição
+                displayName: c.speciality ? formatEnumLabel(c.speciality) : 'N/A',
                 filterKey: c.specialityEnum, // Chave para filtro (ex: CLINICO_GERAL)
             }));
             
@@ -177,7 +178,7 @@ const Consultas = () => {
                     <select value={specialtyFilter} onChange={e => setSpecialtyFilter(e.target.value)}>
                         <option value="">Todas as Categorias</option>
                         {specialityLabels.map(spec => (
-                            <option key={spec} value={spec}>{spec.replace(/_/g, " ")}</option>
+                            <option key={spec} value={spec}>{formatEnumLabel(spec)}</option>
                         ))}
                     </select>
                      <input type="date" value={dateFilter} onChange={e => setDateFilter(e.target.value)} />

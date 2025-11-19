@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -11,24 +11,30 @@ import { BsBellFill, BsChatDots } from 'react-icons/bs';
 const HeaderAdmin = () => {
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [notifications, setNotifications] = useState([]);
     const [notificationCount, setNotificationCount] = useState(0);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const profileRef = useRef(null);
     const notificationRef = useRef(null);
 
-    useEffect(() => {
-        const fetchNotifications = async () => {
-            try {
-                const response = await api.get('/notifications');
-                const unreadCount = response.data.filter(n => !n.read).length;
-                setNotificationCount(unreadCount);
-            } catch (error) {
-                console.error("Erro ao buscar contagem de notificações", error);
-            }
-        };
-        fetchNotifications();
+    const fetchNotifications = useCallback(async () => {
+        try {
+            const response = await api.get('/notifications');
+            const allNotifs = response.data;
+            setNotifications(allNotifs);
+            const unreadCount = allNotifs.filter(n => !n.read).length;
+            setNotificationCount(unreadCount);
+        } catch (error) {
+            console.error("Erro ao buscar notificações", error);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchNotifications();
+        const intervalId = setInterval(fetchNotifications, 15000);
+        return () => clearInterval(intervalId);
+    }, [fetchNotifications]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -72,23 +78,42 @@ const HeaderAdmin = () => {
                 <NavLink to="/admin/chat" className="header-icon" title="Chat"><BsChatDots size={26} /></NavLink>
                 
                 <div className="notification-icon-wrapper" ref={notificationRef}>
-                    <div className="header-icon notification-icon" onClick={() => setShowNotifications(prev => !prev)} title="Notificações">
+                    <button
+                        type="button"
+                        className="header-icon notification-icon"
+                        onClick={() => setShowNotifications(prev => !prev)}
+                        title="Notificações"
+                        aria-haspopup="true"
+                        aria-expanded={showNotifications}
+                    >
                         <BsBellFill size={26} />
                         {notificationCount > 0 && <span className="notification-badge">{notificationCount}</span>}
-                    </div>
-                    {showNotifications && <NotificationDropdown />}
+                    </button>
+                    {showNotifications && (
+                        <NotificationDropdown
+                            notifications={notifications}
+                            onNotificationRead={fetchNotifications}
+                        />
+                    )}
                 </div>
                 
                 <div className="profile-icon-container" ref={profileRef}>
-                    <div className="profile-icon" onClick={() => setShowProfileDropdown(prev => !prev)}>
+                    <button
+                      type="button"
+                      className="profile-icon"
+                      onClick={() => setShowProfileDropdown(prev => !prev)}
+                      aria-haspopup="true"
+                      aria-expanded={showProfileDropdown}
+                      aria-controls="admin-profile-menu"
+                    >
                         <img 
                           src={user?.imageurl || profileIcon} 
                           alt="Perfil"
                           onError={(e) => { e.target.onerror = null; e.target.src = profileIcon; }}
                         />
-                    </div>
+                    </button>
                     {showProfileDropdown && (
-                        <div className="dropdown-menu">
+                        <div id="admin-profile-menu" className="dropdown-menu">
                             <NavLink to="/admin/perfil" className="dropdown-item">Meu Perfil</NavLink>
                             <button onClick={handleLogout} className="dropdown-item" style={{border: 'none', width: '100%', textAlign: 'left', background: 'none', cursor: 'pointer'}}>Sair</button>
                         </div>

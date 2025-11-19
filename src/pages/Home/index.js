@@ -10,8 +10,6 @@ import pontos from '../../assets/images/Home/Pontos.png';
 import Footer from '../../components/Footer';
 import './css/styles.css';
 
-import HeaderSemCadastro from '../../components/HeaderSemCadastro';
-import HeaderComCadastro from '../../components/HeaderComCadastro';
 import { FaPaw, FaHeart, FaCalendarAlt, FaUserMd } from 'react-icons/fa'; 
 
 
@@ -79,9 +77,6 @@ const Home = () => {
 
   return (
     <div className="app">
-      {/* Renderização Condicional do Header */}
-      { user ? <HeaderComCadastro /> : <HeaderSemCadastro /> }
-      
       <div id="divulgacao">
         <div id="cara">
           <h1 id="titulo">Pet Vita <br /> é cuidado</h1>
@@ -174,7 +169,7 @@ const Home = () => {
         </div>
         <div id="videos">
           <div className="carrossel-container">
-            <div className="carrossel" ref={carrosselRef}>
+            <div className="carrossel" id="home-videos" ref={carrosselRef} role="region" aria-label="Carrossel de vídeos">
               {videos.map((videoId, index) => (
                 <div className="carrossel-item" key={videoId}>
                   <iframe
@@ -185,8 +180,8 @@ const Home = () => {
                  </div>
               ))}
             </div>
-            <button className="carrossel-btn anterior">&lt;</button>
-            <button className="carrossel-btn proximo">&gt;</button>
+            <button className="carrossel-btn anterior" aria-controls="home-videos" aria-label="Vídeo anterior">&lt;</button>
+            <button className="carrossel-btn proximo" aria-controls="home-videos" aria-label="Próximo vídeo">&gt;</button>
           </div>
          </div>
       </div>

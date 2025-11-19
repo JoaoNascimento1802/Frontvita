@@ -111,8 +111,14 @@ const ModalRegisterUser = ({ onClose, switchToVet, openLogin, onRegisterSuccess 
 
   return (
     <div className="modal active" onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-         <span className="close" onClick={onClose}>&times;</span>
+      <div
+        className="modal-container"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-register-user-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+         <button className="close" type="button" aria-label="Fechar" onClick={onClose}>&times;</button>
         
         <div className="button-group">
           <button className="button active">Cliente</button>
@@ -122,9 +128,10 @@ const ModalRegisterUser = ({ onClose, switchToVet, openLogin, onRegisterSuccess 
         <div className="logo-modal">
            <img src={logo} alt="Pet Vita Logo" />
         </div>
+        <h2 id="modal-register-user-title" style={{ textAlign: 'center' }}>Cadastro de Cliente</h2>
         
         <form className="form" onSubmit={handleRegister}>
-          {error && <div className="error-message">{error}</div>}
+          {error && <div className="error-message" role="alert" aria-live="assertive">{error}</div>}
           
           <div className="input-group">
            <label htmlFor="username">Nome Completo</label>

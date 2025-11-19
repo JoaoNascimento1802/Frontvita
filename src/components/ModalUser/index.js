@@ -28,8 +28,14 @@ const ModalUser = ({ onClose, switchToVet, switchToRegisterUser, onLoginSuccess,
 
   return (
     <div className="modal active" onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-        <span className="close" onClick={onClose}>&times;</span>
+      <div
+        className="modal-container"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-user-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="close" type="button" aria-label="Fechar" onClick={onClose}>&times;</button>
         <div className="button-group">
           <button className="button active">Cliente</button>
           <button className="button" onClick={switchToVet}>Veterinário</button>
@@ -37,8 +43,9 @@ const ModalUser = ({ onClose, switchToVet, switchToRegisterUser, onLoginSuccess,
         <div className="logo-modal">
           <img src={logo} alt="Pet Vita Logo" />
         </div>
+        <h2 id="modal-user-title" style={{ textAlign: 'center' }}>Login do Cliente</h2>
         <form className="form" onSubmit={handleLogin}>
-          {error && <p className="error-message">{error}</p>}
+          {error && <p className="error-message" role="alert" aria-live="assertive">{error}</p>}
           <div className="input-group">
             <label htmlFor="email-user">Email</label>
             <input 

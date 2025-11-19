@@ -47,8 +47,22 @@ const HeaderSemCadastro = () => {
         </nav>
 
         <div className="auth">
-          <button className="button" onClick={openUserModal}>Login</button>
-          <button className="button" onClick={openRegisterUserModal}>Cadastre-se</button>
+          <button
+            className="button"
+            onClick={openUserModal}
+            aria-haspopup="dialog"
+            aria-label="Abrir modal de login"
+          >
+            Login
+          </button>
+          <button
+            className="button"
+            onClick={openRegisterUserModal}
+            aria-haspopup="dialog"
+            aria-label="Abrir modal de cadastro"
+          >
+            Cadastre-se
+          </button>
         </div>
       </header>
 

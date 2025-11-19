@@ -7,6 +7,7 @@ import ImageCropper from '../../../components/ImageCropper/ImageCropper';
 import profileIcon from '../../../assets/images/Perfil/perfilIcon.png';
 import { FaPencilAlt } from 'react-icons/fa';
 import '../css/styles.css';
+import { formatEnumLabel } from '../../../utils/format';
 
 const specialityOptions = [ "CLINICO_GERAL", "ANESTESIOLOGIA", "CARDIOLOGIA", "DERMATOLOGIA", "ENDOCRINOLOGIA", "GASTROENTEROLOGIA", "NEUROLOGIA", "NUTRICAO", "OFTALMOLOGIA", "ONCOLOGIA", "ORTOPEDIA", "REPRODUCAO_ANIMAL", "PATOLOGIA", "CIRURGIA_GERAL", "CIRURGIA_ORTOPEDICA", "ODONTOLOGIA", "ZOOTECNIA", "EXOTICOS", "ACUPUNTURA", "FISIOTERAPIA", "IMAGINOLOGIA" ];
 
@@ -144,9 +145,9 @@ const VetPerfil = () => {
                                 <label>Especialidade</label>
                                 {isEditing ? (
                                     <select name="specialityenum" value={editData.specialityenum || ''} onChange={handleInputChange} className="info-field editable">
-                                        {specialityOptions.map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
+                                        {specialityOptions.map(s => <option key={s} value={s}>{formatEnumLabel(s)}</option>)}
                                     </select>
-                                ) : <div className="info-field">{vetData.specialityenum?.replace(/_/g, ' ')}</div>}
+                                ) : <div className="info-field">{vetData.specialityenum ? formatEnumLabel(vetData.specialityenum) : ''}</div>}
                             </div>
                             <div className="profile-field">
                                 <label>RG</label>

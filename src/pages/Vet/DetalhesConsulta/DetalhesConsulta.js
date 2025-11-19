@@ -3,7 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import HeaderVet from '../../../components/HeaderVet/HeaderVet';
 import Footer from '../../../components/Footer';
 import api from '../../../services/api';
-import '../css/styles.css';
+import '../css/styles.css'; 
+import { formatEnumLabel } from '../../../utils/format';
 
 const DetalhesConsulta = () => {
     const { consultaId } = useParams();
@@ -81,7 +82,7 @@ const DetalhesConsulta = () => {
                             <div className="form-group"><label>Tutor</label><div className="detail-value">{consulta.userName}</div></div>
                         </div>
                         <div className="form-row">
-                            <div className="form-group"><label>Serviço</label><div className="detail-value">{consulta.speciality}</div></div>
+                            <div className="form-group"><label>Serviço</label><div className="detail-value">{formatEnumLabel(consulta.speciality)}</div></div>
                             <div className="form-group"><label>Data</label><div className="detail-value">{new Date(consulta.consultationdate + 'T' + consulta.consultationtime).toLocaleString('pt-BR')}</div></div>
                         </div>
                         <div className="form-group full-width">

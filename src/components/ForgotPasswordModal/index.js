@@ -26,15 +26,21 @@ const ForgotPasswordModal = ({ onClose, onSwitchToLogin }) => {
 
     return (
         <div className="modal active">
-            <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-                <span className="close" onClick={onClose}>&times;</span>
-                <h2 style={{ textAlign: 'center', fontFamily: 'Poppins, sans-serif' }}>Redefinir Senha</h2>
+            <div
+                className="modal-container"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="modal-forgot-title"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button className="close" type="button" aria-label="Fechar" onClick={onClose}>&times;</button>
+                <h2 id="modal-forgot-title" style={{ textAlign: 'center', fontFamily: 'Poppins, sans-serif' }}>Redefinir Senha</h2>
                 <p style={{ textAlign: 'center', marginBottom: '20px', color: '#555' }}>
                     Digite seu e-mail para receber o link de redefinição.
                 </p>
                 <form onSubmit={handleSubmit} className="form">
-                    {message && <p className="success-message">{message}</p>}
-                    {error && <p className="error-message">{error}</p>}
+                    {message && <p className="success-message" role="status" aria-live="polite">{message}</p>}
+                    {error && <p className="error-message" role="alert" aria-live="assertive">{error}</p>}
                     <div className="input-group">
                         <label htmlFor="email-forgot">Email</label>
                         <input type="email" id="email-forgot" required value={email} onChange={(e) => setEmail(e.target.value)} />
