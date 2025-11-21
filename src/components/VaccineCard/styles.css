@@ -1,0 +1,63 @@
+.vaccine-card {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between; /* Separa conteúdo dos botões */
+    align-items: center;
+    border-left: 5px solid #ccc;
+    transition: transform 0.2s ease;
+    margin-bottom: 15px;
+}
+
+.vaccine-content-wrapper {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    align-items: center;
+}
+
+.vaccine-actions-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-left: 15px;
+    border-left: 1px solid #eee;
+    padding-left: 10px;
+}
+
+.action-vaccine-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-vaccine-btn.edit { color: #8D7EFB; background-color: #f5f0ff; }
+.action-vaccine-btn.edit:hover { background-color: #8D7EFB; color: white; }
+
+.action-vaccine-btn.delete { color: #ff4d4d; background-color: #fff0f0; }
+.action-vaccine-btn.delete:hover { background-color: #ff4d4d; color: white; }
+
+/* Restante do CSS (cores, pills) mantém igual ao anterior */
+.dose-ok-border { border-left-color: #4CAF50; }
+.dose-late-border { border-left-color: #f44336; }
+.dose-unique-border { border-left-color: #8D7EFB; }
+.dose-ok-bg { background-color: #4CAF50; }
+.dose-late-bg { background-color: #f44336; }
+.dose-unique-bg { background-color: #8D7EFB; }
+.status-pill { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; display: inline-flex; align-items: center; color: white; }
+.status-pill.dose-ok { background-color: #4CAF50; }
+.status-pill.dose-late { background-color: #f44336; }
+.status-pill.dose-unique { background-color: #8D7EFB; }
+.vaccine-icon-circle { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; }
+.vaccine-info h4 { margin: 0 0 5px 0; font-size: 1.1rem; color: #333; }
+.vaccine-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.9rem; }
+.vet-name-inline { font-weight: 600; color: #667eea; }

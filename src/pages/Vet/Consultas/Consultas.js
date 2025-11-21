@@ -5,6 +5,7 @@ import Footer from '../../../components/Footer';
 import VetConsultasNav from '../components/VetConsultasNav';
 import api from '../../../services/api';
 import '../css/styles.css';
+import { formatEnumLabel } from '../../../utils/format';
 
 const Consultas = () => {
     const [searchParams] = useSearchParams();
@@ -156,7 +157,7 @@ const Consultas = () => {
                             </div>
                         </div>
                         <div className="request-card-body clickable" onClick={() => handleCardClick(item)}>
-                            <p><strong>Serviço:</strong> {item.speciality}</p>
+                            <p><strong>Serviço:</strong> {formatEnumLabel(item.speciality)}</p>
                             <p><strong>Data:</strong> {new Date(item.consultationdate + 'T' + item.consultationtime).toLocaleString('pt-BR', {dateStyle: 'short', timeStyle: 'short'})}</p>
                         </div>
                         <div className="request-card-actions">

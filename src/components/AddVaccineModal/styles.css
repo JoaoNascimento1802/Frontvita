@@ -1,0 +1,27 @@
+.modal-content-vaccine {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-content-vaccine h3 {
+    margin-top: 0;
+    color: #8D7EFB;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.modal-content-vaccine input,
+.modal-content-vaccine textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+}
+
+/* Reutiliza estilos de botões existentes no seu projeto */

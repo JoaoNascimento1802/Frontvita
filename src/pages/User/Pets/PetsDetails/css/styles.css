@@ -186,3 +186,108 @@
     margin-bottom: 15px;
   }
 }
+ .details-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+ }
+ .tab-button {
+  padding: 10px 18px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #f5f5f5;
+  color: #555;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+ }
+ .tab-button.active {
+  background: #8D7EFB;
+  color: #fff;
+  border-color: #8D7EFB;
+ }
+ .tab-button:hover { transform: translateY(-2px); }
+.vaccines-section {
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+}
+ .vaccines-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+ }
+ .add-vaccine-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #8D7EFB;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+ }
+ .add-vaccine-btn:hover { background-color: #7a6dd9; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(141,126,251,0.3); }
+.vaccines-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+.vaccine-info h4 { margin: 0 0 6px 0; color: #333; }
+.vaccine-info p { margin: 0; color: #666; }
+.vaccine-actions { display: flex; gap: 10px; }
+.no-data { color: #777; }
+ /* Modal de Vacina agora usa base global: .modal-overlay e .modal-content */
+.records-section { margin-top: 10px; background: #fff; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 20px; }
+ .add-record-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #00C49F;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+ }
+ .add-record-btn:hover { background-color: #02a386; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,196,159,0.3); }
+.timeline { position: relative; padding: 10px 0 10px 0; border-left: 3px solid #ebe4f4; margin-left: 12px; }
+ .timeline-item {
+  position: relative;
+  margin-bottom: 30px;
+  padding-left: 30px;
+ }
+ .timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #8D7EFB;
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px #EBE4F4;
+ }
+ .timeline-date { display: flex; gap: 8px; color: #777; margin-bottom: 8px; }
+.timeline-content { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.06); border: 1px solid #f3f3f3; }
+ .timeline-content h4 { color: #8D7EFB; margin-top: 0; }
+ .attachments-list h5, .prescriptions-list h5 { margin: 12px 0 8px 0; color: #333; }
+ .attachment-link {
+  display: inline-block;
+  padding: 8px 12px;
+  background-color: #f0f7ff;
+  color: #007bff;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-right: 10px;
+  font-size: 0.9rem;
+ }
+ .attachment-link:hover { background-color: #e0efff; }

@@ -3,8 +3,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import HeaderVet from '../../../components/HeaderVet/HeaderVet';
 import Footer from '../../../components/Footer';
 import api from '../../../services/api';
-import '../css/styles.css'; 
+import { toast } from 'react-toastify';
+import './css/style.css';
+import profileIcon from '../../../assets/images/Header/perfilIcon.png';
+import { FaFileUpload, FaPrescriptionBottleAlt, FaPlus, FaFileDownload, FaSyringe, FaFileMedical, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { formatEnumLabel } from '../../../utils/format';
+
+import VaccineCard from '../../../components/VaccineCard';
+import AddVaccineModal from '../../../components/AddVaccineModal';
 
 const DetalhesConsulta = () => {
     const { consultaId } = useParams();
@@ -14,22 +20,57 @@ const DetalhesConsulta = () => {
     const [report, setReport] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [recordId, setRecordId] = useState(null);
+    const [attachments, setAttachments] = useState([]);
+    const [prescriptions, setPrescriptions] = useState([]);
+    const [uploading, setUploading] = useState(false);
     
-    useEffect(() => {
-        const fetchConsultaDetails = async () => {
-            if (!consultaId) return;
-            setLoading(true);
-            try {
-                const response = await api.get(`/consultas/${consultaId}`);
-                setConsulta(response.data);
-                setReport(response.data.doctorReport || '');
-            } catch (err) {
-                setError('Não foi possível carregar os detalhes da consulta.');
-                console.error(err);
-            } finally {
-                setLoading(false);
+    const [prescriptionData, setPrescriptionData] = useState({ medication: '', dosage: '', instructions: '' });
+    const [showPrescriptionForm, setShowPrescriptionForm] = useState(false);
+
+    const [vaccines, setVaccines] = useState([]);
+    const [showVaccineModal, setShowVaccineModal] = useState(false);
+    const [editingVaccine, setEditingVaccine] = useState(null);
+
+    const fetchVaccines = async (petId) => {
+        try {
+            const response = await api.get(`/api/vaccines/pet/${petId}`);
+            setVaccines(response.data || []);
+        } catch (err) {
+            console.error("Erro ao buscar vacinas", err);
+        }
+    };
+    
+    const fetchConsultaDetails = async () => {
+        if (!consultaId) return;
+        setLoading(true);
+        try {
+            const response = await api.get(`/consultas/${consultaId}`);
+            setConsulta(response.data);
+            setReport(response.data.doctorReport || '');
+            
+            if (response.data.serviceName === 'Vacinação') {
+                fetchVaccines(response.data.petId);
             }
-        };
+
+            // Se houver ID de prontuário, busca anexos e prescrições
+            if (response.data.medicalRecordId) {
+                setRecordId(response.data.medicalRecordId);
+                try {
+                    const recordRes = await api.get(`/api/medical-records/${response.data.medicalRecordId}`);
+                    setAttachments(recordRes.data.attachments || []);
+                    setPrescriptions(recordRes.data.prescriptions || []);
+                } catch {}
+            }
+        } catch (err) {
+            setError('Não foi possível carregar os detalhes.');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchConsultaDetails();
     }, [consultaId]);
 
@@ -39,80 +80,298 @@ const DetalhesConsulta = () => {
             await api.put(`/consultas/${consultaId}/report`, report, {
                 headers: { 'Content-Type': 'text/plain' }
             });
-            alert('Relatório salvo com sucesso!');
-            navigate('/vet/consultas?tab=historico');
+            toast.success('Relatório salvo e Prontuário inicializado.');
+            // Recarrega para obter o recordId gerado pelo backend
+            fetchConsultaDetails(); 
         } catch (err) {
-            alert('Erro ao salvar o relatório.');
-            console.error(err);
+            toast.error('Erro ao salvar relatório.');
         }
     };
     
     const handleFinalizeConsultation = async () => {
-        if (window.confirm('Tem certeza que deseja finalizar esta consulta? Esta ação não pode ser desfeita.')) {
+        if (window.confirm('Tem certeza que deseja finalizar?')) {
             try {
                 await api.post(`/consultas/${consultaId}/finalize`);
-                alert('Consulta finalizada com sucesso!');
-                navigate('/vet/consultas?tab=historico');
+                toast.success('Finalizada com sucesso!');
+                navigate('/vet/consultas');
             } catch (err) {
-                alert('Erro ao finalizar a consulta.');
-                console.error(err);
+                toast.error('Erro ao finalizar.');
             }
         }
     };
 
-    if (loading) return <div style={{paddingTop: '150px', textAlign: 'center'}}>Carregando...</div>;
-    if (error) return <div style={{paddingTop: '150px', textAlign: 'center'}}>{error}</div>;
+    const handleFileUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        
+        // Trava de segurança no front também
+        if (!recordId) {
+            toast.warn('Salve o relatório primeiro para habilitar uploads.');
+            return;
+        }
+        
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            // Usa a rota antiga que depende do recordId (já que você manteve a lógica original)
+            await api.post(`/veterinary/medical-records/${recordId}/attachments`, formData);
+            toast.success('Enviado com sucesso!');
+            fetchConsultaDetails(); 
+        } catch (error) {
+            toast.error('Erro ao enviar arquivo.');
+            console.error(error);
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleAddPrescription = async (e) => {
+        e.preventDefault();
+        if (!recordId) {
+             toast.warn('Salve o relatório primeiro para habilitar prescrições.');
+             return;
+        }
+
+        try {
+            const payload = {
+                medicationName: prescriptionData.medication,
+                dosage: prescriptionData.dosage,
+                frequency: prescriptionData.instructions,
+                duration: "Uso contínuo/Indefinido"
+            };
+            await api.post(`/veterinary/consultations/${consultaId}/prescriptions`, payload);
+            toast.success('Prescrição adicionada!');
+            setPrescriptionData({ medication: '', dosage: '', instructions: '' });
+            setShowPrescriptionForm(false);
+            fetchConsultaDetails(); 
+        } catch (error) {
+            console.error(error);
+            toast.error('Erro ao adicionar.');
+        }
+    };
+
+    const handleDeleteVaccine = async (vaccineId) => {
+        if (window.confirm('Tem certeza que deseja remover esta vacina?')) {
+            try {
+                await api.delete(`/api/vaccines/${vaccineId}`);
+                toast.success("Vacina removida.");
+                fetchVaccines(consulta.petId);
+            } catch (error) {
+                toast.error('Erro ao deletar vacina.');
+            }
+        }
+    };
+
+    const handleEditVaccine = (vaccine) => {
+        setEditingVaccine(vaccine);
+        setShowVaccineModal(true);
+    };
+
+    const handleAddVaccine = () => {
+        setEditingVaccine(null);
+        setShowVaccineModal(true);
+    };
+
+    const onVaccineSuccess = () => {
+        fetchVaccines(consulta.petId);
+    };
+
+    if (loading) return <div className="loading-container">Carregando...</div>;
     if (!consulta) return null;
 
     return (
         <div className="pets-details-page">
             <HeaderVet />
             <div className="welcome-section">
-                <h1 className="welcome-title">Detalhes da Consulta</h1>
+                <h1 className="welcome-title">Atendimento Clínico</h1>
             </div>
             <div className="pet-details-wrapper">
                 <div className="pet-details-container">
-                    <div className="avatar-display">
-                        <div className="card-avatar-placeholder">{consulta.petName?.charAt(0)}</div>
+                    
+                    {/* CABEÇALHO */}
+                    <div className="section-block info-header">
+                        <div className="avatar-display-small">
+                            {consulta.petImageUrl ? (
+                                <img src={consulta.petImageUrl} alt={consulta.petName} className="pet-avatar-medium" onError={(e) => { e.target.onerror = null; e.target.src = profileIcon; }} />
+                            ) : (
+                                <div className="card-avatar-placeholder">{consulta.petName?.charAt(0)}</div>
+                            )}
+                        </div>
+                        <div className="info-grid">
+                            <div className="info-item">
+                                <label>Paciente</label>
+                                <span>{consulta.petName}</span>
+                            </div>
+                            <div className="info-item">
+                                <label>Tutor</label>
+                                <span>{consulta.userName}</span>
+                            </div>
+                            <div className="info-item">
+                                <label>Serviço</label>
+                                <span>{formatEnumLabel(consulta.speciality)}</span>
+                            </div>
+                            <div className="info-item">
+                                <label>Data/Hora</label>
+                                <span>{new Date(consulta.consultationdate + 'T' + consulta.consultationtime).toLocaleString('pt-BR')}</span>
+                            </div>
+                        </div>
                     </div>
-                    <form onSubmit={handleSaveReport} className="details-form">
-                        <div className="form-row">
-                            <div className="form-group"><label>Paciente (Pet)</label><div className="detail-value">{consulta.petName}</div></div>
-                            {/* CORREÇÃO: Exibindo o nome do tutor vindo da API */}
-                            <div className="form-group"><label>Tutor</label><div className="detail-value">{consulta.userName}</div></div>
+
+                    {/* MOTIVO */}
+                    <div className="section-block">
+                        <div className="section-title">
+                            <FaInfoCircle /> Motivo da Consulta
                         </div>
-                        <div className="form-row">
-                            <div className="form-group"><label>Serviço</label><div className="detail-value">{formatEnumLabel(consulta.speciality)}</div></div>
-                            <div className="form-group"><label>Data</label><div className="detail-value">{new Date(consulta.consultationdate + 'T' + consulta.consultationtime).toLocaleString('pt-BR')}</div></div>
+                        <div className="detail-value long-text readonly">
+                            {consulta.reason}
                         </div>
-                        <div className="form-group full-width">
-                            <label>Motivo da Consulta (informado pelo tutor)</label>
-                            <div className="detail-value long-text">{consulta.reason}</div>
+                    </div>
+
+                    {/* VACINAÇÃO */}
+                    {consulta.serviceName === 'Vacinação' && (
+                        <div className="section-block vaccination-block">
+                            <div className="section-title-row">
+                                <h3><FaSyringe /> Carteira de Vacinação</h3>
+                                <button className="add-btn-small" onClick={handleAddVaccine}>
+                                    <FaPlus /> Registrar Dose
+                                </button>
+                            </div>
+                            <div className="vaccines-list">
+                                {vaccines.length === 0 ? (
+                                    <p className="no-data">Nenhuma vacina registrada.</p>
+                                ) : (
+                                    [...vaccines].sort((a, b) => new Date(b.applicationDate) - new Date(a.applicationDate)).map(vac => (
+                                        <VaccineCard 
+                                            key={vac.id} 
+                                            vaccine={vac} 
+                                            isVet={true} 
+                                            onDelete={handleDeleteVaccine}
+                                            onEdit={handleEditVaccine}
+                                        />
+                                    ))
+                                )}
+                            </div>
                         </div>
-                        <div className="form-group full-width">
-                            <label>Anotações / Relatório Médico</label>
-                            <textarea 
-                                className="report-textarea" 
-                                placeholder="Digite as observações, diagnóstico e tratamento..." 
-                                value={report} 
-                                onChange={(e) => setReport(e.target.value)}
-                                // Permite editar relatório apenas se a consulta estiver agendada
-                                disabled={consulta.status !== 'AGENDADA'}
-                            ></textarea>
-                        </div>
-                        <div className="details-actions">
-                            <Link to="/vet/consultas" className="back-button">Voltar</Link>
-                            {/* Mostra os botões apenas para consultas agendadas */}
-                            {consulta.status === 'AGENDADA' && (
+                    )}
+
+                    {/* RELATÓRIO MÉDICO */}
+                    <div className="section-block report-block">
+                        <div className="section-title"><FaFileMedical /> Relatório Médico & Diagnóstico</div>
+                        <textarea 
+                            className="report-textarea" 
+                            value={report} 
+                            onChange={(e) => setReport(e.target.value)} 
+                            rows="8" 
+                            placeholder="Escreva aqui o diagnóstico, observações clínicas e evolução do paciente..." 
+                            disabled={consulta.status === 'FINALIZADA'} 
+                        />
+                        {consulta.status === 'AGENDADA' && (
+                            <div className="action-right">
+                                <button className="save-report-btn" onClick={handleSaveReport}>Salvar Relatório</button>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="split-columns">
+                        {/* ANEXOS */}
+                        <div className="section-block half-width">
+                            <div className="section-title"><FaFileUpload /> Anexos e Exames</div>
+                            
+                            {(consulta.status === 'AGENDADA' || consulta.status === 'FINALIZADA') && (
                                 <>
-                                    <button type="button" className="decline-button" onClick={handleFinalizeConsultation}>Finalizar Consulta</button>
-                                    <button type="submit" className="save-button">Salvar Relatório</button>
+                                    {/* --- AVISO INSTRUTIVO --- */}
+                                    {!recordId && consulta.status === 'AGENDADA' && (
+                                        <div className="warning-box">
+                                            <FaExclamationTriangle /> 
+                                            <span>Salve o <strong>Relatório Médico</strong> acima primeiro para habilitar o envio de anexos.</span>
+                                        </div>
+                                    )}
+
+                                    {recordId && consulta.status === 'AGENDADA' && (
+                                        <div className="upload-controls">
+                                            <input type="file" id="exam-upload" style={{display: 'none'}} onChange={handleFileUpload} disabled={uploading} />
+                                            <label htmlFor="exam-upload" className="upload-button">{uploading ? 'Enviando...' : 'Selecionar Arquivo'}</label>
+                                        </div>
+                                    )}
+                                    <ul className="attachments-list">
+                                        {attachments.length === 0 && <p className="no-data-small">Nenhum anexo.</p>}
+                                        {attachments.map(att => (
+                                            <li key={att.id}>
+                                                <a href={att.fileUrl} target="_blank" rel="noopener noreferrer"><FaFileDownload/> {att.fileName}</a>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </>
                             )}
                         </div>
-                    </form>
+
+                        {/* PRESCRIÇÕES */}
+                        <div className="section-block half-width">
+                            <div className="section-title-row">
+                                <div className="section-title"><FaPrescriptionBottleAlt /> Prescrições</div>
+                                {consulta.status === 'AGENDADA' && recordId && (
+                                    <button className="add-btn-icon" onClick={() => setShowPrescriptionForm(!showPrescriptionForm)} title="Adicionar Prescrição">
+                                        <FaPlus />
+                                    </button>
+                                )}
+                            </div>
+                            
+                            {(consulta.status === 'AGENDADA' || consulta.status === 'FINALIZADA') && (
+                                <>
+                                    {/* --- AVISO INSTRUTIVO --- */}
+                                    {!recordId && consulta.status === 'AGENDADA' && (
+                                        <div className="warning-box">
+                                            <FaExclamationTriangle /> 
+                                            <span>Salve o <strong>Relatório Médico</strong> acima para habilitar a prescrição.</span>
+                                        </div>
+                                    )}
+
+                                    {showPrescriptionForm && (
+                                        <div className="prescription-form-container">
+                                            <input placeholder="Medicamento" value={prescriptionData.medication} onChange={e => setPrescriptionData({...prescriptionData, medication: e.target.value})} className="presc-input"/>
+                                            <input placeholder="Dosagem" value={prescriptionData.dosage} onChange={e => setPrescriptionData({...prescriptionData, dosage: e.target.value})} className="presc-input"/>
+                                            <textarea placeholder="Instruções..." value={prescriptionData.instructions} onChange={e => setPrescriptionData({...prescriptionData, instructions: e.target.value})} className="presc-input" rows="2"/>
+                                            <button className="confirm-btn-small" onClick={handleAddPrescription}>Salvar</button>
+                                        </div>
+                                    )}
+
+                                    <div className="prescriptions-list-view">
+                                        {prescriptions.length === 0 && <p className="no-data-small">Nenhuma prescrição.</p>}
+                                        {prescriptions.map((p, idx) => (
+                                            <div key={idx} className="prescription-item-card-small">
+                                                <strong>{p.medicationName}</strong>
+                                                <span>{p.dosage}</span>
+                                                <p>{p.frequency}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* AÇÕES FINAIS */}
+                    <div className="details-actions sticky-actions">
+                        <Link to="/vet/consultas" className="back-button">Voltar</Link>
+                        <Link to={`/vet/chat`} className="chat-button-link">Chat com Tutor</Link>
+                        {consulta.status === 'AGENDADA' && (
+                            <button type="button" className="finalize-button" onClick={handleFinalizeConsultation}>Finalizar Atendimento</button>
+                        )}
+                    </div>
+
                 </div>
             </div>
+            
+            {showVaccineModal && (
+                <AddVaccineModal 
+                    petId={consulta.petId} 
+                    vaccineToEdit={editingVaccine}
+                    onClose={() => setShowVaccineModal(false)} 
+                    onSuccess={onVaccineSuccess} 
+                />
+            )}
+
             <Footer />
         </div>
     );

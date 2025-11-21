@@ -6,6 +6,7 @@ import Footer from '../../../../components/Footer';
 import { useAuth } from '../../../../context/AuthContext';
 import api from '../../../../services/api';
 import '../css/styles.css'; 
+import { formatEnumLabel } from '../../../../utils/format';
 
 const ConsulPending = () => {
     const [allAppointments, setAllAppointments] = useState([]);
@@ -96,9 +97,13 @@ const ConsulPending = () => {
                             <span className="numero-dia">{dia}</span>
                             {consultasDoDia.length > 0 && (
                                 <div className="marcadores-container">
-                                {consultasDoDia.map((consulta) => (
-                                    <div key={consulta.id} className="marcador-consulta" title={`${consulta.petName} às ${consulta.consultationtime}`}></div>
-                                ))}
+                                {consultasDoDia.map((consulta) => {
+                                    const s = (consulta.status || '').toLowerCase();
+                                    const statusClass = s === 'finalizada' ? 'finalizada' : s === 'agendada' ? 'agendada' : s === 'pendente' ? 'pendente' : (s === 'cancelada' || s === 'recusada') ? 'cancelada' : '';
+                                    return (
+                                        <div key={consulta.id} className={`marcador-consulta ${statusClass}`} title={`${consulta.petName} às ${consulta.consultationtime}`}></div>
+                                    );
+                                })}
                                 </div>
                             )}
                         </div>
@@ -153,7 +158,7 @@ const ConsulPending = () => {
                     <div className="pet-card">
                         <div className="pet-info">
                             <h3 className="pet-name">{c.petName}</h3>
-                            <span className="card-subtitle">{c.speciality} com {c.veterinaryName}</span>
+                            <span className="card-subtitle">{formatEnumLabel(c.speciality)} com {c.veterinaryName}</span>
                             <span className="card-subtitle">{new Date(c.consultationdate + 'T00:00:00').toLocaleDateString('pt-BR')} às {c.consultationtime}</span>
                         </div>
                         <span className={`status-badge ${c.status.toLowerCase()}`}>{c.status}</span>

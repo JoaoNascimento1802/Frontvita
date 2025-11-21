@@ -167,6 +167,10 @@
 .marcador-consulta:hover {
   background-color: #8d7efb;
 }
+.marcador-consulta.agendada { background-color: #4CAF50; }
+.marcador-consulta.pendente { background-color: #FFC107; }
+.marcador-consulta.finalizada { background-color: #B0BEC5; }
+.marcador-consulta.cancelada { background-color: #f44336; }
 
 
 /* =================================================== */
