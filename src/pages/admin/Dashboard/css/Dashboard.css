@@ -391,17 +391,201 @@
 }
 
 @media (max-width: 480px) {
+  .admin-content {
+    padding: 12px;
+    padding-top: 110px;
+  }
+
+  .dashboard-header-flex h1 {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .period-selector {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .period-selector button {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .kpi-card {
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .kpi-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .kpi-info h3 {
+    font-size: 0.9rem;
+  }
+
+  .kpi-info p {
+    font-size: 1.4rem;
+  }
+
+  .chart-card {
+    padding: 15px;
+  }
+
+  .chart-card h3 {
+    font-size: 1rem;
+  }
+
+  .chart-wrapper {
+    height: 250px;
+  }
+
   .welcome-text h1 {
     font-size: 1.8rem;
+  }
+
+  .welcome-text p {
+    font-size: 0.95rem;
   }
 
   .test-email-button {
     width: 100%;
     padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+
+  .cards-grid {
+    gap: 20px;
+  }
+
+  .card-image-wrapper {
+    height: 200px;
   }
 
   .card-footer {
     font-size: 1rem;
     padding: 18px 20px;
+  }
+}
+
+@media (max-width: 400px) {
+  .admin-content {
+    padding: 10px;
+    padding-top: 105px;
+  }
+
+  .dashboard-header-flex h1 {
+    font-size: 1.3rem;
+  }
+
+  .period-selector button {
+    padding: 7px 12px;
+    font-size: 0.85rem;
+  }
+
+  .kpi-card {
+    padding: 12px;
+  }
+
+  .kpi-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .kpi-info h3 {
+    font-size: 0.85rem;
+  }
+
+  .kpi-info p {
+    font-size: 1.3rem;
+  }
+
+  .chart-wrapper {
+    height: 220px;
+  }
+
+  .welcome-text h1 {
+    font-size: 1.6rem;
+  }
+
+  .welcome-text p {
+    font-size: 0.9rem;
+  }
+
+  .test-email-button {
+    font-size: 0.9rem;
+    padding: 10px 18px;
+  }
+
+  .card-image-wrapper {
+    height: 180px;
+  }
+
+  .card-footer {
+    font-size: 0.95rem;
+    padding: 15px 18px;
+  }
+}
+
+@media (max-width: 360px) {
+  .admin-content {
+    padding: 8px;
+    padding-top: 100px;
+  }
+
+  .dashboard-header-flex h1 {
+    font-size: 1.2rem;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+  }
+
+  .period-selector button {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+
+  .kpi-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .kpi-info h3 {
+    font-size: 0.8rem;
+  }
+
+  .kpi-info p {
+    font-size: 1.2rem;
+  }
+
+  .chart-card {
+    padding: 12px;
+  }
+
+  .chart-wrapper {
+    height: 200px;
+  }
+
+  .welcome-text h1 {
+    font-size: 1.4rem;
+  }
+
+  .card-image-wrapper {
+    height: 160px;
+  }
+
+  .card-footer {
+    font-size: 0.9rem;
+    padding: 12px 15px;
   }
 }

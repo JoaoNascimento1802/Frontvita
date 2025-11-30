@@ -13,12 +13,16 @@ const HeaderEmployee = () => {
   const [profileImage, setProfileImage] = useState(profileIcon);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  
   const dropdownRef = useRef(null);
   const notifRef = useRef(null);
+  
+  // Estados de Notificação
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // --- LÓGICA DE IMAGEM DO PERFIL ---
   useEffect(() => {
     if (user?.imageurl) {
       setProfileImage(user.imageurl);
@@ -31,25 +35,11 @@ const HeaderEmployee = () => {
         setProfileImage(`${user.imageurl}?t=${new Date().getTime()}`);
       }
     };
-
     window.addEventListener('userProfileUpdated', handleProfileUpdate);
     return () => window.removeEventListener('userProfileUpdated', handleProfileUpdate);
   }, [user]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-      if (notifRef.current && !notifRef.current.contains(event.target)) {
-        setShowNotifications(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
+  // --- LÓGICA DE NOTIFICAÇÃO (CORRIGIDA) ---
   const fetchNotifications = useCallback(async () => {
     if (!user) return;
     try {
@@ -59,15 +49,29 @@ const HeaderEmployee = () => {
       const count = allNotifs.filter(n => !n.read).length;
       setUnreadCount(count);
     } catch (error) {
-      console.error('Erro ao buscar notificações', error);
+      console.error('Erro ao buscar notificações do funcionário:', error);
     }
   }, [user]);
 
   useEffect(() => {
-    fetchNotifications();
-    const intervalId = setInterval(fetchNotifications, 15000);
+    fetchNotifications(); // Busca inicial
+    const intervalId = setInterval(fetchNotifications, 15000); // Atualiza a cada 15s
     return () => clearInterval(intervalId);
   }, [fetchNotifications]);
+
+  // Fecha dropdowns ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -79,15 +83,17 @@ const HeaderEmployee = () => {
       <div className="logo">
         <NavLink to="/employee/dashboard"><img src={logo} alt="Pet Vita Logo" /></NavLink>
       </div>
+      
       <nav className="nav nav-center">
         <NavLink to="/employee/dashboard" className="nav_link">Painel</NavLink>
-        <NavLink to="/employee/servicos" className="nav_link">Serviços</NavLink> {/* CORRIGIDO */}
+        <NavLink to="/employee/servicos" className="nav_link">Serviços</NavLink>
         <NavLink to="/employee/agenda" className="nav_link">Agenda</NavLink>
-        <NavLink to="/employee/chat" className="nav_link">Chat</NavLink>
       </nav>
+      
       <div className="icons-container">
         <NavLink to="/employee/chat" className="header-icon" title="Chat"><BsChatDots size={26} /></NavLink>
 
+        {/* Ícone de Notificação */}
         <div className="notification-icon-wrapper" ref={notifRef} style={{ position: 'relative' }}>
           <button
             type="button"
@@ -105,6 +111,7 @@ const HeaderEmployee = () => {
           )}
         </div>
 
+        {/* Ícone de Perfil */}
         <div className="profile-icon-container" ref={dropdownRef}>
           <button
             type="button"

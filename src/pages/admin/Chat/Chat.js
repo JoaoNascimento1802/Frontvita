@@ -1,4 +1,3 @@
-// src/pages/admin/Chat/Chat.js
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
@@ -12,7 +11,7 @@ const AdminChat = () => {
     const messagesEndRef = useRef(null);
 
     const [conversations, setConversations] = useState([]);
-    const [activeConversation, setActiveConversation] = useState(null); // Agora vai guardar { id, type, ...data }
+    const [activeConversation, setActiveConversation] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [loadingConversations, setLoadingConversations] = useState(true);
@@ -24,11 +23,9 @@ const AdminChat = () => {
         const fetchConversations = async () => {
             setLoadingConversations(true);
             try {
-                // Listas para guardar os dados
                 let allConsultas = [];
                 let allServicos = [];
 
-                // Se for ADMIN, busca tudo
                 if (user.role === 'ADMIN') {
                     const [consultasRes, servicosRes] = await Promise.all([
                         api.get('/admin/consultations'),
@@ -37,36 +34,41 @@ const AdminChat = () => {
                     allConsultas = consultasRes.data || [];
                     allServicos = servicosRes.data || [];
                 } 
-                // Se for FUNCIONÁRIO, busca só os serviços dele
                 else if (user.role === 'EMPLOYEE') {
                     const servicosRes = await api.get('/api/employee/my-schedules');
                     allServicos = servicosRes.data || [];
-                    // Opcional: Funcionário também pode ver consultas? Se sim, descomente a linha abaixo.
-                    // const consultasRes = await api.get('/admin/consultations'); 
-                    // allConsultas = consultasRes.data || [];
                 }
 
-                // Mapeia consultas para o formato unificado
+                // Mapeia Consultas (Admin vê tudo)
                 const mappedConsultas = allConsultas
-                    .filter(c => ['PENDENTE', 'AGENDADA', 'FINALIZADA', 'CHECKED_IN', 'EM_ANDAMENTO'].includes(c.status))
+                    .filter(c => ['AGENDADA', 'FINALIZADA', 'CHECKED_IN', 'EM_ANDAMENTO'].includes(c.status))
                     .map(c => ({
                         id: c.id,
-                        type: 'consultation', // Identifica o tipo
-                        displayName: `${c.userName} <> ${c.veterinaryName}`,
-                        petName: `Pet: ${c.petName} (Consulta #${c.id})`,
+                        chatRoomId: c.chatRoomId, // UUID
+                        type: 'consultation',
+                        displayName: `${c.userName} (Tutor) - ${c.veterinaryName} (Vet)`,
+                        petName: `Pet: ${c.petName} - ${c.speciality}`,
                         avatarChar: c.userName?.charAt(0)
                     }));
 
-                // Mapeia serviços para o formato unificado
+                // Mapeia Serviços (Admin vê tudo, Func vê seus clientes)
                 const mappedServicos = allServicos
-                    .filter(s => ['PENDENTE', 'AGENDADA', 'FINALIZADA'].includes(s.status))
-                    .map(s => ({
-                        id: s.id,
-                        type: 'service', // Identifica o tipo
-                        displayName: `${s.clientName} <> ${s.employeeName}`,
-                        petName: `Pet: ${s.petName} (Serviço #${s.id})`,
-                        avatarChar: s.clientName?.charAt(0)
-                    }));
+                    .filter(s => ['AGENDADA', 'FINALIZADA'].includes(s.status))
+                    .map(s => {
+                        // MELHORIA DE UI: Se for funcionário, mostra só o nome do cliente
+                        const displayName = user.role === 'EMPLOYEE' 
+                            ? `${s.clientName} (Tutor)`
+                            : `${s.clientName} (Tutor) - ${s.employeeName} (Func)`;
+
+                        return {
+                            id: s.id,
+                            chatRoomId: s.chatRoomId, // UUID
+                            type: 'service',
+                            displayName: displayName,
+                            petName: `Pet: ${s.petName} - ${s.serviceName}`,
+                            avatarChar: s.clientName?.charAt(0)
+                        };
+                    });
                 
                 setConversations([...mappedConsultas, ...mappedServicos]);
 
@@ -80,16 +82,18 @@ const AdminChat = () => {
     }, [user, authLoading]);
 
     useEffect(() => {
-        // Agora o 'listener' depende do tipo de conversa ativa
         if (!activeConversation) return;
 
         setLoadingMessages(true);
         
-        const collectionName = activeConversation.type === 'service' ? 'services' : 'consultas';
-        const docId = activeConversation.id.toString();
+        // Lógica de UUID vs Legado
+        const roomId = activeConversation.chatRoomId || activeConversation.id.toString();
+        const collectionName = activeConversation.chatRoomId ? 'chats' : (activeConversation.type === 'service' ? 'services' : 'consultas');
+
+        console.log(`Conectando ao chat [${collectionName}]: ${roomId}`);
 
         const q = query(
-            collection(firestore, `${collectionName}/${docId}/mensagens`),
+            collection(firestore, `${collectionName}/${roomId}/mensagens`),
             orderBy("timestamp", "asc")
         );
         
@@ -120,12 +124,13 @@ const AdminChat = () => {
         const originalMessage = newMessage;
         setNewMessage('');
 
-        // --- CORREÇÃO: Envia para a rota correta (consulta ou serviço) ---
-        const { type, id } = activeConversation;
+        // Define a URL baseada no tipo (consulta ou serviço)
+        const endpointType = activeConversation.type === 'service' ? 'service' : 'consultation';
         
         try {
-            await api.post(`/chat/${type}/${id}`, originalMessage, {
-                headers: { 'Content-Type': 'text/plain' }
+            // Envia JSON { content: ... }
+            await api.post(`/chat/${endpointType}/${activeConversation.id}`, {
+                content: originalMessage
             });
         } catch (err) {
             console.error("Erro ao enviar mensagem:", err);
@@ -139,19 +144,25 @@ const AdminChat = () => {
             <div className="chat-sidebar">
                 <div className="sidebar-header"><h3>Conversas Ativas</h3></div>
                 <div className="contact-list">
-                    {loadingConversations ? <p style={{ padding: '20px', textAlign: 'center' }}>Carregando...</p> : conversations.map(conv => (
-                        <div 
-                            key={`${conv.type}-${conv.id}`} 
-                            className={`contact-item ${activeConversation?.id === conv.id && activeConversation?.type === conv.type ? 'active' : ''}`}
-                            onClick={() => handleConversationClick(conv)}
-                        >
-                            <div className="card-avatar-placeholder">{conv.avatarChar}</div>
-                            <div className="contact-info">
-                                <span className="contact-name">{conv.displayName}</span>
-                                <span className="contact-last-message">{conv.petName}</span>
+                    {loadingConversations ? (
+                        <p style={{ padding: '20px', textAlign: 'center' }}>Carregando...</p>
+                    ) : conversations.length === 0 ? (
+                        <p style={{ padding: '20px', textAlign: 'center', color: '#999' }}>Nenhuma conversa encontrada.</p>
+                    ) : (
+                        conversations.map(conv => (
+                            <div 
+                                key={`${conv.type}-${conv.id}`} 
+                                className={`contact-item ${activeConversation?.id === conv.id && activeConversation?.type === conv.type ? 'active' : ''}`}
+                                onClick={() => handleConversationClick(conv)}
+                            >
+                                <div className="card-avatar-placeholder">{conv.avatarChar}</div>
+                                <div className="contact-info">
+                                    <span className="contact-name">{conv.displayName}</span>
+                                    <span className="contact-last-message">{conv.petName}</span>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
             
@@ -170,7 +181,12 @@ const AdminChat = () => {
                             <div ref={messagesEndRef} />
                         </div>
                         <form className="message-input-area" onSubmit={handleSendMessage}>
-                            <input type="text" placeholder="Digite sua mensagem..." value={newMessage} onChange={(e) => setNewMessage(e.target.value)} />
+                            <input 
+                                type="text" 
+                                placeholder="Digite sua mensagem..." 
+                                value={newMessage} 
+                                onChange={(e) => setNewMessage(e.target.value)} 
+                            />
                             <button type="submit"><IoSend size={22} /></button>
                         </form>
                     </>

@@ -67,3 +67,32 @@
     transform: rotate(360deg);
   }
 }
+
+/* Responsividade Mobile-First */
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding-top: 90px;
+  }
+
+  .page-content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .main-content {
+    padding-top: 85px;
+  }
+}
+
+@media (max-width: 360px) {
+  .main-content {
+    padding-top: 80px;
+  }
+}

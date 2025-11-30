@@ -79,10 +79,10 @@ const HeaderVet = () => {
         <NavLink to="/vet/dashboard"><img src={logo} alt="Pet Vita Logo" /></NavLink>
       </div>
       
-      <nav className="nav nav-center">
-        <NavLink to="/vet/dashboard" className="nav_link">Home</NavLink>
-        <NavLink to="/vet/consultas" className="nav_link">Consultas</NavLink>
-        <NavLink to="/vet/relatorios" className="nav_link">Relatórios</NavLink>
+      <nav className="nav nav-center" aria-label="Navegação do veterinário">
+        <NavLink to="/vet/dashboard" className={({isActive}) => `nav_link ${isActive ? 'active' : ''}`}>Home</NavLink>
+        <NavLink to="/vet/consultas" className={({isActive}) => `nav_link ${isActive ? 'active' : ''}`}>Consultas</NavLink>
+        <NavLink to="/vet/relatorios" className={({isActive}) => `nav_link ${isActive ? 'active' : ''}`}>Relatórios</NavLink>
       </nav>
 
       <div className="icons-container">

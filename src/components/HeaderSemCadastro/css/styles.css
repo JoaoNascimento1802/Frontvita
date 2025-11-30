@@ -312,3 +312,15 @@
     text-align: center;
   }
 }
+
+@media (max-width: 400px) {
+  .logo img {
+    width: 65px;
+  }
+}
+
+@media (max-width: 360px) {
+  .logo img {
+    width: 60px;
+  }
+}

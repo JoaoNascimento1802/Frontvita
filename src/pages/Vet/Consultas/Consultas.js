@@ -156,7 +156,13 @@ const Consultas = () => {
                                 <span className="owner-name">Tutor(a): {item.userName}</span> 
                             </div>
                         </div>
-                        <div className="request-card-body clickable" onClick={() => handleCardClick(item)}>
+                        <div
+                            className="request-card-body clickable"
+                            onClick={() => handleCardClick(item)}
+                            role="button"
+                            tabIndex="0"
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(item); } }}
+                        >
                             <p><strong>Serviço:</strong> {formatEnumLabel(item.speciality)}</p>
                             <p><strong>Data:</strong> {new Date(item.consultationdate + 'T' + item.consultationtime).toLocaleString('pt-BR', {dateStyle: 'short', timeStyle: 'short'})}</p>
                         </div>

@@ -207,13 +207,13 @@
 }
 
 /* Cores dos títulos ajustadas para #C49DF6 */
-.footer-links h6,
-.footer-contact h6,
-.footer-social h6 {
+.footer-links h2,
+.footer-contact h2,
+.footer-social h2 {
   font-family: "Poppins", sans-serif;
   font-weight: 600;
   font-size: 18px;
-  color: #C49DF6; /* Cor alterada para #C49DF6 */
+  color: #333333;
   margin-bottom: 20px;
 }
 

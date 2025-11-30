@@ -562,6 +562,15 @@
   }
 }
 
+@media (max-width: 480px) {
+  .welcome-text h1 { font-size: 1.6rem; }
+  .request-card-actions { gap: 8px; }
+  .accept-button, .decline-button, .details-button-vet { padding: 10px; font-size: 0.95rem; }
+}
+@media (max-width: 360px) {
+  .welcome-text h1 { font-size: 1.4rem; }
+}
+
 /* ========================================= */
 /* 9. ESTILOS PÁGINA: CHAT (VET)             */
 /* ========================================= */
@@ -617,6 +626,10 @@
   cursor: pointer;
   transition: background-color 0.2s;
   position: relative;
+}
+.contact-item:focus-visible {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 2px;
 }
 .contact-item:hover {
   background-color: #f9f7ff;

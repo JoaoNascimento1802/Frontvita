@@ -89,63 +89,70 @@ const HeaderComCadastro = () => {
   };
 
   return (
-    <header className="header">
+    <header className="header" role="banner">
       <div className="logo">
-        <NavLink to="/">
-           <img src={logo} alt="Pet Vita Logo" />
+        <NavLink to="/" aria-label="Pet Vita - Ir para página inicial">
+           <img src={logo} alt="Pet Vita - Logotipo da clínica veterinária" />
         </NavLink>
       </div>
       
-      <nav className="nav nav-center">
+      <nav id="nav" className="nav nav-center" aria-label="Navegação principal">
         <NavLink 
           to="/" 
           className={({ isActive }) => `nav_link ${isActive ? 'active' : ''}`}
+          aria-current={({ isActive }) => isActive ? 'page' : undefined}
         >
           Home
         </NavLink>
         <NavLink 
           to="/consultas" 
           className={({ isActive }) => `nav_link ${isActive ? 'active' : ''}`}
+          aria-current={({ isActive }) => isActive ? 'page' : undefined}
         >
            Consultas
         </NavLink>
         <NavLink 
           to="/pets" 
           className={({ isActive }) => `nav_link ${isActive ? 'active' : ''}`}
+          aria-current={({ isActive }) => isActive ? 'page' : undefined}
         >
           Pets
         </NavLink>
         <NavLink 
           to="/sobre-nos" 
           className={({ isActive }) => `nav_link ${isActive ? 'active' : ''}`}
+          aria-current={({ isActive }) => isActive ? 'page' : undefined}
         >
           Sobre nós
         </NavLink>
         <NavLink 
           to="/conversations" 
           className={({ isActive }) => `nav_link ${isActive ? 'active' : ''}`}
+          aria-current={({ isActive }) => isActive ? 'page' : undefined}
         >
           Chat
         </NavLink>
       </nav>
       
-      <div className="icons-container">
+      <div className="icons-container" role="toolbar" aria-label="Ações rápidas">
     
         {/* --- ROTA ATUALIZADA AQUI --- */}
         <NavLink 
           to="/agendar-escolha" 
           className="calendar-icon" 
-          title="Agendar"
+          aria-label="Agendar nova consulta"
         >
-          <img src={calendarIcon} alt="Calendário" />
+          <img src={calendarIcon} alt="" aria-hidden="true" />
+          <span className="sr-only">Agendar</span>
         </NavLink>
         
         <NavLink 
           to="/conversations" 
           className="header-icon" 
-          title="Chat"
+          aria-label="Abrir conversas do chat"
         >
-          <BsChatDots size={26} />
+          <BsChatDots size={26} aria-hidden="true" />
+          <span className="sr-only">Chat</span>
         </NavLink>
         
         <div className="notification-icon-wrapper" ref={notifRef} style={{ position: 'relative' }}>
@@ -155,13 +162,22 @@ const HeaderComCadastro = () => {
             onClick={() => setShowNotifications(!showNotifications)}
             aria-haspopup="true"
             aria-expanded={showNotifications}
-            title="Notificações"
+            aria-label={`Notificações${unreadCount > 0 ? ` - ${unreadCount} não lidas` : ''}`}
           >
-            <BsBellFill size={26} />
-            {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
+            <BsBellFill size={26} aria-hidden="true" />
+            {unreadCount > 0 && (
+              <span className="notification-badge" aria-label={`${unreadCount} notificações não lidas`}>
+                {unreadCount}
+              </span>
+            )}
           </button>
           {showNotifications && (
-            <NotificationDropdown notifications={notifications} onNotificationRead={fetchNotifications} />
+            <NotificationDropdown 
+              notifications={notifications} 
+              onNotificationRead={fetchNotifications}
+              role="region"
+              aria-label="Lista de notificações"
+            />
           )}
         </div>
         
@@ -170,29 +186,33 @@ const HeaderComCadastro = () => {
             type="button"
             className="profile-icon"
             onClick={() => setShowDropdown(!showDropdown)}
-            aria-haspopup="true"
+            aria-haspopup="menu"
             aria-expanded={showDropdown}
             aria-controls="user-profile-menu"
+            aria-label="Menu do perfil do usuário"
           >
             <img 
               src={userImage} 
-              alt="Perfil" 
+              alt="" 
+              aria-hidden="true"
               onError={(e) => { e.target.onerror = null; e.target.src = profileIcon; }}
             />
           </button>
           
           {showDropdown && (
-            <div id="user-profile-menu" className="dropdown-menu">
+            <div id="user-profile-menu" className="dropdown-menu" role="menu">
               <NavLink 
                 to="/perfil" 
                 className="dropdown-item"
                 onClick={() => setShowDropdown(false)}
+                role="menuitem"
               >
                 Meu Perfil
               </NavLink>
               <button 
                  onClick={handleLogout} 
                 className="dropdown-item" 
+                role="menuitem"
                 style={{
                   border: 'none', 
                    width: '100%', 

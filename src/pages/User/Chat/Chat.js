@@ -1,5 +1,5 @@
 // src/pages/User/Chat/Chat.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import HeaderComCadastro from '../../../components/HeaderComCadastro';
 import Footer from '../../../components/Footer';
@@ -8,44 +8,57 @@ import { useAuth } from '../../../context/AuthContext';
 import { IoSend } from 'react-icons/io5';
 import { firestore } from '../../../services/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import './css/styles.css';
+import './css/chat-styles.css';
 
 const Chat = () => {
-     const { consultationId } = useParams(); // ID da Consulta
+    const { consultationId } = useParams(); // ID da Consulta
     const { user } = useAuth();
-    const messagesEndRef = useRef(null);
 
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [chatPartnerName, setChatPartnerName] = useState('Carregando...');
+    const [chatRoomId, setChatRoomId] = useState(null);
     
     useEffect(() => {
-        const fetchPartnerName = async () => {
+        const fetchDetails = async () => {
             if (!user) return;
             try {
                 const consultaResponse = await api.get(`/consultas/${consultationId}`);
+                setChatRoomId(consultaResponse.data.chatRoomId);
                 const partner = user.role === 'USER' ? consultaResponse.data.veterinaryName : consultaResponse.data.userName;
                 setChatPartnerName(partner || "Desconhecido");
-             } catch (err) {
+            } catch (err) {
                 console.error("Erro ao buscar detalhes da consulta", err);
                 setChatPartnerName("Desconhecido");
             }
         };
-        fetchPartnerName();
-     }, [consultationId, user]);
+        fetchDetails();
+    }, [consultationId, user]);
 
     useEffect(() => {
-        if (!consultationId) return;
+        if (!chatRoomId) return;
         setLoading(true);
+
+        // DIAGNÓSTICO: Verifica se o chatRoomId está chegando
+        console.log("Conectando ao chat do usuário. Consultation ID:", consultationId, "UUID (Room):", chatRoomId);
+
+        // LÓGICA CORRETA: Usa 'chatRoomId' se existir.
+        // Se for uma consulta muito antiga sem UUID, usa o ID normal (fallback)
+        const roomId = chatRoomId || consultationId;
+
+        // Define a coleção base. Se tiver UUID, usa 'chats', senão usa a antiga 'consultas'
+        const collectionName = chatRoomId ? 'chats' : 'consultas';
+
         const q = query(
-            collection(firestore, `consultas/${consultationId}/mensagens`), // Ouve a coleção "consultas"
+            collection(firestore, `${collectionName}/${roomId}/mensagens`),
             orderBy("timestamp", "asc")
         );
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const msgs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            console.log("Firebase snapshot recebido. Total de mensagens:", msgs.length);
             setMessages(msgs);
             setLoading(false);
         }, (err) => {
@@ -53,12 +66,11 @@ const Chat = () => {
             setError("Não foi possível carregar o chat.");
             setLoading(false);
         });
-        return () => unsubscribe();
-    }, [consultationId]);
-    
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+        return () => {
+            console.log("Limpando listener do Firebase");
+            unsubscribe();
+        };
+    }, [chatRoomId, consultationId]);
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
@@ -77,48 +89,54 @@ const Chat = () => {
         }
     };
 
+    console.log("Renderizando chat. Messages:", messages.length, "Loading:", loading);
+
     return (
-        <div className="chat-page">
+        <div className="user-chat-page">
             <HeaderComCadastro />
-            <div className="chat-container">
-                 <div className="chat-sidebar">
-                    <div className="sidebar-header"><h3>Conversa</h3></div>
-                    <div className="contact-list">
-                        <div className="contact-item active">
-                             <div className="contact-info">
-                                <span className="contact-name">Consulta #{consultationId}</span>
-                             </div>
+            <div className="user-chat-container">
+                <div className="user-chat-sidebar">
+                    <div className="user-sidebar-header">
+                        <h3>Conversa</h3>
+                    </div>
+                    <div className="user-contact-list">
+                        <div className="user-contact-item">
+                            <span style={{ fontWeight: 600, color: '#333' }}>Consulta #{consultationId}</span>
                         </div>
                     </div>
                 </div>
 
-                 <div className="chat-main">
-                    <div className="chat-header">
-                        <span className="contact-name">{chatPartnerName} (Veterinário)</span>
+                <div className="user-chat-main">
+                    <div className="user-chat-header">
+                        <span style={{ fontWeight: 600, color: '#333' }}>{chatPartnerName} (Veterinário)</span>
                     </div>
-                     <div className="message-area">
+                    <div className="user-message-area">
                         {loading && <p>Carregando histórico...</p>}
-                        {error && <p className="error-message">{error}</p>}
-                         {!loading && messages.map(msg => (
-                            <div key={msg.id} className={`message ${msg.senderId === user.id ? 'sent' : 'received'}`}>
-                                 <strong>{msg.senderName}: </strong>
-                                 {msg.content}
+                        {error && <p style={{ color: '#d32f2f' }}>{error}</p>}
+                        {!loading && messages.map(msg => (
+                            <div 
+                                key={msg.id} 
+                                className={`user-message ${msg.senderId === user.id ? 'sent' : 'received'}`}
+                            >
+                                <strong>{msg.senderName}: </strong>
+                                {msg.content}
                             </div>
                         ))}
-                         <div ref={messagesEndRef} />
                     </div>
-                    <form className="message-input-area" onSubmit={handleSendMessage}>
-                         <input 
+                    <form className="user-message-input-area" onSubmit={handleSendMessage}>
+                        <input 
                             type="text" 
                             placeholder='Digite sua mensagem...'
-                             value={newMessage}
+                            value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                         />
-                         <button type="submit"> <IoSend size={22} /> </button>
+                        <button type="submit">
+                            <IoSend size={22} />
+                        </button>
                     </form>
                 </div>
             </div>
-             <Footer />
+            <Footer />
         </div>
     );
 };

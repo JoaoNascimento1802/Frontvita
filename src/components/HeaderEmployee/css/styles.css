@@ -123,3 +123,15 @@
   color: #B77EFF;
   transform: scale(1.1);
 }
+
+@media (max-width: 480px) {
+  .header { padding: 12px 16px; height: auto; gap: 8px; }
+  .logo img { width: 72px; }
+  .nav.nav-center { position: static; transform: none; }
+  .nav { flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .nav a { font-size: 1rem; }
+  .icons-container { gap: 12px; }
+  .profile-icon { width: 36px; height: 36px; }
+}
+@media (max-width: 400px) { .nav a { font-size: 0.95rem; } }
+@media (max-width: 360px) { .nav a { font-size: 0.9rem; } }

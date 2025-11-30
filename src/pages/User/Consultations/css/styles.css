@@ -120,7 +120,7 @@
 }
 .calendario-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 10px;
 }
 .dia-semana {
@@ -570,5 +570,214 @@
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
+  }
+}
+
+/* Responsividade Mobile-First Completa */
+@media (max-width: 768px) {
+  .main-content-consultation h1 {
+    font-size: 1.8rem;
+    margin: 2rem 0 1.5rem 0;
+  }
+
+  .pet-profile-container {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .status-buttons {
+    gap: 12px;
+  }
+
+  .status-button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    min-width: 100px;
+  }
+
+  .pet-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .pet-name {
+    font-size: 1.1rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .status-badge {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .calendario-grid {
+    gap: 8px;
+  }
+
+  .dia-celula {
+    min-height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content-consultation h1 {
+    font-size: 1.5rem;
+    margin: 1.5rem 0 1rem 0;
+  }
+
+  .pet-profile-container {
+    width: 98%;
+    padding: 15px;
+    border-radius: 12px;
+  }
+
+  .status-buttons {
+    gap: 10px;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .status-button {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    width: 100%;
+  }
+
+  .action-button-primary {
+    padding: 12px 25px;
+    font-size: 1rem;
+  }
+
+  .pet-card {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .pet-name {
+    font-size: 1rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .status-badge {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+
+  .calendario-container {
+    padding: 16px;
+  }
+
+  .calendario-grid {
+    gap: 6px;
+  }
+
+  .dia-celula {
+    min-height: 80px;
+    padding: 6px;
+  }
+
+  .numero-dia {
+    font-size: 0.9rem;
+  }
+
+  .marcador-consulta {
+    width: 8px;
+    height: 8px;
+  }
+
+  .pet-details-wrapper {
+    width: 98%;
+    padding: 15px 10px;
+  }
+
+  .pet-details-container {
+    padding: 15px;
+  }
+
+  .form-group label {
+    font-size: 0.75rem;
+  }
+
+  .detail-value {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+
+  .doctor-rating-container {
+    padding: 20px;
+  }
+
+  .doctor-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .doctor-details h4 {
+    font-size: 1.1rem;
+  }
+
+  .star {
+    font-size: 1.5rem;
+  }
+
+  .submit-rating,
+  .report-button {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .main-content-consultation h1 {
+    font-size: 1.3rem;
+  }
+
+  .status-button {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+
+  .pet-name {
+    font-size: 0.95rem;
+  }
+
+  .dia-celula {
+    min-height: 70px;
+    padding: 4px;
+  }
+
+  .numero-dia {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .main-content-consultation h1 {
+    font-size: 1.2rem;
+  }
+
+  .pet-profile-container {
+    padding: 12px;
+  }
+
+  .dia-celula {
+    min-height: 68px;
+  }
+
+  .pet-card {
+    padding: 10px;
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 5px 10px;
   }
 }

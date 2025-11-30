@@ -20,38 +20,43 @@ const HeaderSemCadastro = () => {
 
   return (
     <>
-      <header className="header">
+      <header className="header" role="banner">
         <div className="logo">
-          <Link to="/"><img src={logo} alt="Pet Vita Logo" /></Link>
+          <Link to="/" aria-label="Pet Vita - Ir para página inicial">
+            <img src={logo} alt="Pet Vita - Logotipo da clínica veterinária" />
+          </Link>
         </div>
         
-        <nav className="nav nav-center">
+        <nav id="nav" className="nav nav-center" aria-label="Navegação principal">
           <Link 
             to="/" 
             className={`nav_link ${isActiveLink('/') ? 'active' : ''}`}
+            aria-current={isActiveLink('/') ? 'page' : undefined}
           >
             Home
           </Link>
           <Link 
             to="/app" 
             className={`nav_link ${isActiveLink('/app') ? 'active' : ''}`}
+            aria-current={isActiveLink('/app') ? 'page' : undefined}
           >
             App
           </Link>
           <Link 
             to="/sobre-nos" 
             className={`nav_link ${isActiveLink('/sobre-nos') ? 'active' : ''}`}
+            aria-current={isActiveLink('/sobre-nos') ? 'page' : undefined}
           >
             Saiba Mais
           </Link>
         </nav>
 
-        <div className="auth">
+        <div className="auth" role="toolbar" aria-label="Autenticação">
           <button
             className="button"
             onClick={openUserModal}
             aria-haspopup="dialog"
-            aria-label="Abrir modal de login"
+            aria-label="Abrir formulário de login"
           >
             Login
           </button>
@@ -59,7 +64,7 @@ const HeaderSemCadastro = () => {
             className="button"
             onClick={openRegisterUserModal}
             aria-haspopup="dialog"
-            aria-label="Abrir modal de cadastro"
+            aria-label="Abrir formulário de cadastro"
           >
             Cadastre-se
           </button>

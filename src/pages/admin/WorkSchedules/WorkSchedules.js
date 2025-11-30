@@ -7,7 +7,27 @@ import './WorkSchedules.css';
 
 // --- CORREÇÃO DO LOOP INFINITO ---
 // Definindo a constante FORA do componente, ela não será recriada a cada renderização.
-const dayOfWeekNames = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
+
+// Ordem correta dos dias da semana (em inglês, como vem do backend)
+const dayOrder = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+
+// Mapeamento de dias da semana do inglês para português
+const dayTranslation = {
+    "MONDAY": "Segunda-feira",
+    "TUESDAY": "Terça-feira",
+    "WEDNESDAY": "Quarta-feira",
+    "THURSDAY": "Quinta-feira",
+    "FRIDAY": "Sexta-feira",
+    "SATURDAY": "Sábado",
+    "SUNDAY": "Domingo",
+    "SEGUNDA": "Segunda-feira",
+    "TERÇA": "Terça-feira",
+    "QUARTA": "Quarta-feira",
+    "QUINTA": "Quinta-feira",
+    "SEXTA": "Sexta-feira",
+    "SÁBADO": "Sábado",
+    "DOMINGO": "Domingo"
+};
 
 const WorkSchedules = () => {
     const [vets, setVets] = useState([]);
@@ -61,8 +81,9 @@ const WorkSchedules = () => {
             // A URL agora corresponde ao novo controller: /admin/schedules/...
             const response = await api.get(`/admin/schedules/${type}/${id}`);
             
+            // Ordena os horários pela ordem correta dos dias da semana
             const sortedSchedules = response.data.sort((a, b) => 
-                dayOfWeekNames.indexOf(a.dayOfWeek) - dayOfWeekNames.indexOf(b.dayOfWeek)
+                dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek)
             );
             setSchedules(sortedSchedules);
         } catch (error) {
@@ -141,7 +162,7 @@ const WorkSchedules = () => {
                             <tbody>
                                 {schedules.map(schedule => (
                                     <tr key={schedule.id}>
-                                        <td>{schedule.dayOfWeek.replace(/_/g, ' ')}</td>
+                                        <td>{dayTranslation[schedule.dayOfWeek] || schedule.dayOfWeek.replace(/_/g, ' ')}</td>
                                         <td>
                                             <input
                                                 type="checkbox"

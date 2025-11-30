@@ -107,17 +107,120 @@
   gap: 30px;
 }
 
-/* Responsividade */
+/* Responsividade Mobile-First Completa */
 @media (max-width: 768px) {
+  .dashboard-content {
+    padding: 15px;
+    padding-top: 120px;
+  }
+
   .welcome-section {
     flex-direction: column;
     text-align: center;
     gap: 20px;
+    margin-bottom: 30px;
   }
-  .bottom-cards {
-    grid-template-columns: 1fr;
-  }
+
   .welcome-text h1 {
     font-size: 2rem;
+  }
+
+  .visualizar-button {
+    width: 100%;
+    padding: 12px 24px;
+  }
+
+  .bottom-cards {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .card-footer {
+    padding: 15px 20px;
+    font-size: 0.95rem;
+  }
+
+  .notification-badge-card {
+    font-size: 0.85rem;
+    padding: 4px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-content {
+    padding: 12px;
+    padding-top: 100px;
+  }
+
+  .welcome-section {
+    margin-bottom: 25px;
+  }
+
+  .welcome-text h1 {
+    font-size: 1.6rem;
+  }
+
+  .visualizar-button {
+    padding: 10px 20px;
+    font-size: 0.85rem;
+  }
+
+  .cards-container {
+    gap: 20px;
+  }
+
+  .bottom-cards {
+    gap: 15px;
+  }
+
+  .card-footer {
+    padding: 12px 15px;
+    font-size: 0.9rem;
+  }
+
+  .notification-badge-card {
+    font-size: 0.8rem;
+    padding: 3px 8px;
+  }
+
+  .main-card,
+  .small-card {
+    border-radius: 15px;
+  }
+}
+
+@media (max-width: 400px) {
+  .welcome-text h1 {
+    font-size: 1.4rem;
+  }
+
+  .visualizar-button {
+    font-size: 0.8rem;
+    padding: 9px 18px;
+  }
+
+  .card-footer {
+    font-size: 0.85rem;
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .dashboard-content {
+    padding: 10px;
+    padding-top: 95px;
+  }
+
+  .welcome-text h1 {
+    font-size: 1.3rem;
+  }
+
+  .cards-container {
+    gap: 15px;
+  }
+
+  .main-card,
+  .small-card {
+    border-radius: 12px;
   }
 }

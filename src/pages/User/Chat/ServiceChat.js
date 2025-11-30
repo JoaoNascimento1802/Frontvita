@@ -8,7 +8,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { IoSend } from 'react-icons/io5';
 import { firestore } from '../../../services/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import './css/styles.css';
+import './css/chat-styles.css';
 
 const ServiceChat = () => {
     const { serviceScheduleId } = useParams(); // ID do Serviço
@@ -80,47 +80,52 @@ const ServiceChat = () => {
     };
 
     return (
-        <div className="chat-page">
+        <div className="user-chat-page">
             <HeaderComCadastro />
-            <div className="chat-container">
-                 <div className="chat-sidebar">
-                    <div className="sidebar-header"><h3>Conversa</h3></div>
-                    <div className="contact-list">
-                        <div className="contact-item active">
-                             <div className="contact-info">
-                                <span className="contact-name">Serviço #{serviceScheduleId}</span>
-                             </div>
+            <div className="user-chat-container">
+                <div className="user-chat-sidebar">
+                    <div className="user-sidebar-header">
+                        <h3>Conversa</h3>
+                    </div>
+                    <div className="user-contact-list">
+                        <div className="user-contact-item">
+                            <span style={{ fontWeight: 600, color: '#333' }}>Serviço #{serviceScheduleId}</span>
                         </div>
                     </div>
                 </div>
 
-                 <div className="chat-main">
-                    <div className="chat-header">
-                        <span className="contact-name">{chatPartnerName} (Funcionário)</span>
+                <div className="user-chat-main">
+                    <div className="user-chat-header">
+                        <span style={{ fontWeight: 600, color: '#333' }}>{chatPartnerName} (Funcionário)</span>
                     </div>
-                     <div className="message-area">
+                    <div className="user-message-area">
                         {loading && <p>Carregando histórico...</p>}
-                        {error && <p className="error-message">{error}</p>}
-                         {!loading && messages.map(msg => (
-                            <div key={msg.id} className={`message ${msg.senderId === user.id ? 'sent' : 'received'}`}>
-                                 <strong>{msg.senderName}: </strong>
-                                 {msg.content}
+                        {error && <p style={{ color: '#d32f2f' }}>{error}</p>}
+                        {!loading && messages.map(msg => (
+                            <div 
+                                key={msg.id} 
+                                className={`user-message ${msg.senderId === user.id ? 'sent' : 'received'}`}
+                            >
+                                <strong>{msg.senderName}: </strong>
+                                {msg.content}
                             </div>
                         ))}
-                         <div ref={messagesEndRef} />
+                        <div ref={messagesEndRef} />
                     </div>
-                    <form className="message-input-area" onSubmit={handleSendMessage}>
-                         <input 
+                    <form className="user-message-input-area" onSubmit={handleSendMessage}>
+                        <input 
                             type="text" 
                             placeholder='Digite sua mensagem...'
-                             value={newMessage}
+                            value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                         />
-                         <button type="submit"> <IoSend size={22} /> </button>
+                        <button type="submit">
+                            <IoSend size={22} />
+                        </button>
                     </form>
                 </div>
             </div>
-             <Footer />
+            <Footer />
         </div>
     );
 };
