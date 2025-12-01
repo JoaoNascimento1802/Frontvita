@@ -12,11 +12,13 @@
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
+  pointer-events: none;
 }
 
 .modal-user.active {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .modal-container {
@@ -41,15 +43,27 @@
   position: absolute;
   top: 15px;
   right: 20px;
-  font-size: 28px;
-  font-weight: bold;
+  font-size: 24px;
+  font-weight: 300;
   cursor: pointer;
-  color: #333;
-  transition: color 0.2s;
+  color: #999;
+  background: none;
+  border: none;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  line-height: 1;
+  padding: 0;
 }
 
 .close:hover {
   color: #B77EFF;
+  background-color: rgba(183, 126, 255, 0.1);
+  transform: rotate(90deg);
 }
 
 .logo-modal {
@@ -219,6 +233,20 @@
   border-radius: 5px;
   text-align: center;
   margin-bottom: 15px;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+}
+
+.success-message {
+  color: #4caf50;
+  background-color: #e8f5e9;
+  border: 1px solid #4caf50;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
 }
 
 .cancel-button {
@@ -234,4 +262,77 @@
 
 .cancel-button:hover {
   background-color: #cc0000;
+}
+
+/* Button Group para alternar entre Cliente/Veterinário */
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.button-group .button {
+  flex: 1;
+  padding: 10px 25px;
+  border: none;
+  background: linear-gradient(135deg, #B77EFF, #9D5AFF);
+  color: white;
+  border-radius: 25px;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(183, 126, 255, 0.3);
+  opacity: 0.5;
+}
+
+.button-group .button:hover {
+  opacity: 0.7;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(183, 126, 255, 0.4);
+}
+
+.button-group .button.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Requisitos de senha */
+.password-requirements {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.password-requirements p {
+  margin: 5px 0;
+  font-family: "Poppins", sans-serif;
+}
+
+.password-requirements .valid {
+  color: #4caf50;
+}
+
+.password-requirements .invalid {
+  color: #f44336;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

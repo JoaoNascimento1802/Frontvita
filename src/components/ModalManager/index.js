@@ -140,8 +140,13 @@ const ModalManager = ({ initialModal, onClose }) => {
   };
 
   return ReactDOM.createPortal(
-    <div className="modal-overlay">
-      {renderModal()}
+    <div className="modal-overlay" onClick={(e) => {
+      // Não fecha ao clicar no overlay - apenas com botão X
+      e.stopPropagation();
+    }}>
+      <div onClick={(e) => e.stopPropagation()}>
+        {renderModal()}
+      </div>
     </div>,
     document.body
   );

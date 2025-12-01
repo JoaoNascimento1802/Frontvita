@@ -31,7 +31,6 @@ const ForgotPasswordModal = ({ onClose, onSwitchToLogin }) => {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="modal-forgot-title"
-                onClick={(e) => e.stopPropagation()}
             >
                 <button className="close" type="button" aria-label="Fechar" onClick={onClose}>&times;</button>
                 <h2 id="modal-forgot-title" style={{ textAlign: 'center', fontFamily: 'Poppins, sans-serif' }}>Redefinir Senha</h2>

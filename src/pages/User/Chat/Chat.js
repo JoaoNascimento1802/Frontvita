@@ -5,7 +5,8 @@ import HeaderComCadastro from '../../../components/HeaderComCadastro';
 import Footer from '../../../components/Footer';
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import { IoSend } from 'react-icons/io5';
+import { IoSend, IoArrowBack } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
 import { firestore } from '../../../services/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import './css/chat-styles.css';
@@ -78,9 +79,9 @@ const Chat = () => {
         const originalMessage = newMessage;
         setNewMessage('');
         try {
-            // --- ROTA ATUALIZADA ---
-            await api.post(`/chat/consultation/${consultationId}`, originalMessage, {
-                headers: { 'Content-Type': 'text/plain' }
+            // CORREÇÃO: Removemos o terceiro argumento que continha o header text/plain
+            await api.post(`/chat/consultation/${consultationId}`, {
+                content: originalMessage
             });
         } catch (err) {
              console.error("Erro ao enviar mensagem:", err);

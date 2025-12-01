@@ -3,10 +3,10 @@ import HeaderVet from '../../../components/HeaderVet/HeaderVet';
 import Footer from '../../../components/Footer';
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import { IoSend } from 'react-icons/io5';
+import { IoSend, IoArrowBack } from 'react-icons/io5';
 import { firestore } from '../../../services/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import '../css/styles.css'; 
+import '../../User/Chat/css/chat-styles.css'; 
 
 const VetChat = () => {
     const { user, loading: authLoading } = useAuth();
@@ -117,10 +117,9 @@ const VetChat = () => {
         setNewMessage(''); // Limpa input imediatamente para melhor UX
 
         try {
-            // --- CORREÇÃO CRÍTICA AQUI ---
-            // A URL estava /chat/{id}, mas o backend agora exige /chat/consultation/{id}
-            await api.post(`/chat/consultation/${activeConversation.id}`, originalMessage, {
-                headers: { 'Content-Type': 'text/plain' }
+            // CORREÇÃO: Removido o header manual
+            await api.post(`/chat/consultation/${activeConversation.id}`, {
+                content: originalMessage
             });
         } catch (err) {
             console.error("Erro ao enviar mensagem:", err);
@@ -130,22 +129,21 @@ const VetChat = () => {
     };
 
     return (
-        <div className="chat-page">
+        <div className="user-chat-page">
             <HeaderVet />
-            <div className="chat-container">
-                <div className="chat-sidebar">
-                    <div className="sidebar-header"><h3>Conversas</h3></div>
-                    <div className="contact-list">
+            <div className={`user-chat-container ${activeConversation ? 'chat-active' : ''}`}>
+                <div className="user-chat-sidebar">
+                    <div className="user-sidebar-header"><h3>Conversas</h3></div>
+                    <div className="user-contact-list">
                         {loadingConversations ? <p style={{padding: '20px'}}>Carregando...</p> : conversations.map(conv => (
                             <div 
                                 key={conv.id} 
-                                className={`contact-item ${activeConversation?.id === conv.id ? 'active' : ''}`}
+                                className={`user-contact-item ${activeConversation?.id === conv.id ? 'active' : ''}`}
                                 onClick={() => handleConversationClick(conv)}
                             >
-                                <div className="card-avatar-placeholder">{conv.userName?.charAt(0)}</div>
                                 <div className="contact-info">
-                                    <span className="contact-name">{conv.userName}</span>
-                                    <span className="contact-last-message">Pet: {conv.petName}</span>
+                                    <span style={{ fontWeight: 600, color: '#333' }}>{conv.userName}</span>
+                                    <span style={{ fontSize: '0.9rem', color: '#888' }}>Pet: {conv.petName}</span>
                                 </div>
                                 {unreadConversations.has(conv.id) && <span className="unread-badge">!</span>}
                             </div>
@@ -156,21 +154,28 @@ const VetChat = () => {
                     </div>
                 </div>
                 
-                <div className="chat-main">
+                <div className="user-chat-main">
                     {activeConversation ? (
                         <>
-                            <div className="chat-header">
-                                <span className="contact-name">{activeConversation.userName} (Tutor de {activeConversation.petName})</span>
+                            <div className="user-chat-header">
+                                <button 
+                                    className="back-to-list-btn"
+                                    onClick={() => setActiveConversation(null)}
+                                    aria-label="Voltar para lista de conversas"
+                                >
+                                    <IoArrowBack size={24} />
+                                </button>
+                                <span style={{ fontWeight: 600, color: 'white' }}>{activeConversation.userName} (Tutor de {activeConversation.petName})</span>
                             </div>
-                            <div className="message-area">
+                            <div className="user-message-area">
                                 {loadingMessages ? <p>Carregando mensagens...</p> : messages.map(msg => (
-                                    <div key={msg.id} className={`message ${msg.senderId === user.id ? 'sent' : 'received'}`}>
+                                    <div key={msg.id} className={`user-message ${msg.senderId === user.id ? 'sent' : 'received'}`}>
                                         {msg.content}
                                     </div>
                                 ))}
                                 <div ref={messagesEndRef} />
                             </div>
-                            <form className="message-input-area" onSubmit={handleSendMessage}>
+                            <form className="user-message-input-area" onSubmit={handleSendMessage}>
                                 <input 
                                     type="text" 
                                     placeholder='Digite sua mensagem...'
@@ -181,7 +186,9 @@ const VetChat = () => {
                             </form>
                         </>
                     ) : (
-                        <div className="no-chat-selected">Selecione uma conversa para começar</div>
+                        <div className="user-message-area" style={{ alignItems: 'center', justifyContent: 'center' }}>
+                            <p style={{ color: '#888', fontSize: '1.2rem' }}>Selecione uma conversa para começar</p>
+                        </div>
                     )}
                 </div>
             </div>

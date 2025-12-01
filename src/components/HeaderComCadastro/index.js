@@ -13,6 +13,7 @@ import './css/styles.css';
 const HeaderComCadastro = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [userImage, setUserImage] = useState(profileIcon);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const notifRef = useRef(null);
@@ -95,12 +96,23 @@ const HeaderComCadastro = () => {
            <img src={logo} alt="Pet Vita - Logotipo da clínica veterinária" />
         </NavLink>
       </div>
+
+      <button 
+        className="mobile-menu-toggle" 
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        aria-label="Menu de navegação"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       
-      <nav id="nav" className="nav nav-center" aria-label="Navegação principal">
+      <nav id="nav" className={`nav ${mobileMenuOpen ? 'mobile-open' : ''}`} aria-label="Navegação principal">
         <NavLink 
           to="/" 
           className={({ isActive }) => `nav_link ${isActive ? 'active' : ''}`}
           aria-current={({ isActive }) => isActive ? 'page' : undefined}
+          onClick={() => setMobileMenuOpen(false)}
         >
           Home
         </NavLink>
@@ -108,6 +120,7 @@ const HeaderComCadastro = () => {
           to="/consultas" 
           className={({ isActive }) => `nav_link ${isActive ? 'active' : ''}`}
           aria-current={({ isActive }) => isActive ? 'page' : undefined}
+          onClick={() => setMobileMenuOpen(false)}
         >
            Consultas
         </NavLink>
@@ -115,6 +128,7 @@ const HeaderComCadastro = () => {
           to="/pets" 
           className={({ isActive }) => `nav_link ${isActive ? 'active' : ''}`}
           aria-current={({ isActive }) => isActive ? 'page' : undefined}
+          onClick={() => setMobileMenuOpen(false)}
         >
           Pets
         </NavLink>
@@ -122,6 +136,7 @@ const HeaderComCadastro = () => {
           to="/sobre-nos" 
           className={({ isActive }) => `nav_link ${isActive ? 'active' : ''}`}
           aria-current={({ isActive }) => isActive ? 'page' : undefined}
+          onClick={() => setMobileMenuOpen(false)}
         >
           Sobre nós
         </NavLink>
@@ -129,12 +144,37 @@ const HeaderComCadastro = () => {
           to="/conversations" 
           className={({ isActive }) => `nav_link ${isActive ? 'active' : ''}`}
           aria-current={({ isActive }) => isActive ? 'page' : undefined}
+          onClick={() => setMobileMenuOpen(false)}
         >
           Chat
         </NavLink>
+
+        {/* Icons para mobile - dentro do nav */}
+        <div className="icons-mobile">
+          <NavLink to="/agendar-escolha" className="icon-item" onClick={() => setMobileMenuOpen(false)}>
+            <img src={calendarIcon} alt="" style={{ width: 24, height: 24 }} />
+            <span className="icon-label">Agendar</span>
+          </NavLink>
+          <NavLink to="/conversations" className="icon-item" onClick={() => setMobileMenuOpen(false)}>
+            <BsChatDots size={24} color="#8D7EFB" />
+            <span className="icon-label">Chat</span>
+          </NavLink>
+          <NavLink to="/perfil" className="icon-item" onClick={() => setMobileMenuOpen(false)}>
+            <img src={userImage} alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = profileIcon; }} />
+            <span className="icon-label">Meu Perfil</span>
+          </NavLink>
+          <button className="icon-item" onClick={() => { handleLogout(); setMobileMenuOpen(false); }} style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer' }}>
+            <span className="icon-label" style={{ color: '#ff4d4d' }}>Sair</span>
+          </button>
+        </div>
       </nav>
+
+      {/* Overlay para fechar menu */}
+      {mobileMenuOpen && (
+        <div className="mobile-overlay active" onClick={() => setMobileMenuOpen(false)} />
+      )}
       
-      <div className="icons-container" role="toolbar" aria-label="Ações rápidas">
+      <div className="icons-container icons-desktop" role="toolbar" aria-label="Ações rápidas">
     
         {/* --- ROTA ATUALIZADA AQUI --- */}
         <NavLink 

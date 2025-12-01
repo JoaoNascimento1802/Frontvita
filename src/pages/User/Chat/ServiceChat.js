@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import HeaderComCadastro from '../../../components/HeaderComCadastro';
 import Footer from '../../../components/Footer';
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import { IoSend } from 'react-icons/io5';
+import { IoSend, IoArrowBack } from 'react-icons/io5';
 import { firestore } from '../../../services/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import './css/chat-styles.css'; // Garanta que seu CSS com as classes .user-* está aqui
@@ -12,6 +12,7 @@ import './css/chat-styles.css'; // Garanta que seu CSS com as classes .user-* es
 const ServiceChat = () => {
     const { serviceScheduleId } = useParams();
     const { user } = useAuth();
+    const navigate = useNavigate();
     const messagesEndRef = useRef(null);
 
     const [messages, setMessages] = useState([]);
@@ -89,6 +90,7 @@ const ServiceChat = () => {
         setNewMessage('');
         
         try {
+            // CORREÇÃO: Apenas a URL e o Objeto de dados
             await api.post(`/chat/service/${serviceScheduleId}`, {
                 content: originalMessage
             });
@@ -102,6 +104,12 @@ const ServiceChat = () => {
     return (
         <div className="user-chat-page">
             <HeaderComCadastro />
+            
+            <button className="back-button-outside" onClick={() => navigate('/conversations')}>
+                <IoArrowBack size={20} />
+                Voltar para conversas
+            </button>
+            
             <div className="user-chat-container">
                  <div className="user-chat-sidebar">
                     <div className="user-sidebar-header">

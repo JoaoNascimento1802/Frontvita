@@ -11,6 +11,7 @@ import './css/styles.css';
 const HeaderEmployee = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [profileImage, setProfileImage] = useState(profileIcon);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   
@@ -83,14 +84,42 @@ const HeaderEmployee = () => {
       <div className="logo">
         <NavLink to="/employee/dashboard"><img src={logo} alt="Pet Vita Logo" /></NavLink>
       </div>
+
+      <button 
+        className="mobile-menu-toggle" 
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        aria-label="Menu de navegação"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       
-      <nav className="nav nav-center">
-        <NavLink to="/employee/dashboard" className="nav_link">Painel</NavLink>
-        <NavLink to="/employee/servicos" className="nav_link">Serviços</NavLink>
-        <NavLink to="/employee/agenda" className="nav_link">Agenda</NavLink>
+      <nav className={`nav ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+        <NavLink to="/employee/dashboard" className="nav_link" onClick={() => setMobileMenuOpen(false)}>Painel</NavLink>
+        <NavLink to="/employee/servicos" className="nav_link" onClick={() => setMobileMenuOpen(false)}>Serviços</NavLink>
+        <NavLink to="/employee/agenda" className="nav_link" onClick={() => setMobileMenuOpen(false)}>Agenda</NavLink>
+        
+        {/* Icons para mobile */}
+        <div className="icons-mobile">
+          <NavLink to="/employee/chat" className="icon-item" onClick={() => setMobileMenuOpen(false)}>
+            <BsChatDots size={24} color="#8D7EFB" />
+            <span className="icon-label">Chat</span>
+          </NavLink>
+          <NavLink to="/employee/perfil" className="icon-item" onClick={() => setMobileMenuOpen(false)}>
+            <img src={profileImage || profileIcon} alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = profileIcon; }} />
+            <span className="icon-label">Meu Perfil</span>
+          </NavLink>
+          <button className="icon-item" onClick={() => { handleLogout(); setMobileMenuOpen(false); }} style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer' }}>
+            <span className="icon-label" style={{ color: '#ff4d4d' }}>Sair</span>
+          </button>
+        </div>
       </nav>
+
+      {/* Overlay */}
+      {mobileMenuOpen && <div className="mobile-overlay active" onClick={() => setMobileMenuOpen(false)} />}
       
-      <div className="icons-container">
+      <div className="icons-container icons-desktop">
         <NavLink to="/employee/chat" className="header-icon" title="Chat"><BsChatDots size={26} /></NavLink>
 
         {/* Ícone de Notificação */}

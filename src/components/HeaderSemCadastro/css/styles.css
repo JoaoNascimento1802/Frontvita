@@ -1,4 +1,5 @@
-/* components/css/styles.css */
+/* HeaderSemCadastro */
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -17,109 +18,62 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  z-index: 1001;
 }
 
 .logo img {
   width: 90px;
-  transition: transform 0.3s ease;
 }
 
-.logo img:hover {
-  transform: scale(1.05);
+/* Hamburguer - escondido em desktop */
+.mobile-menu-toggle {
+  display: none !important;
+  visibility: hidden !important;
 }
 
+/* Navegação desktop */
 .nav {
-  display: flex; 
-  justify-content: flex-start; 
-  align-items: center; 
-  gap: 30px; /* Aumentei o gap para melhor espaçamento */
+  display: flex !important;
+  align-items: center;
+  gap: 30px;
 }
 
-/* ESTILOS BASE PARA TODOS OS LINKS */
 .nav_link {
   text-decoration: none;
   font-size: 18px;
   font-family: "Poppins", sans-serif;
   font-weight: 700;
-  font-style: normal;
-  position: relative;
-  padding-bottom: 8px;
-  transition: all 0.3s ease;
-  color: black; /* Cor padrão para links inativos */
-}
-
-/* ESTADO NORMAL (INATIVO) */
-.nav_link {
   color: black;
+  padding-bottom: 8px;
+  position: relative;
 }
 
-/* EFEITO HOVER PARA LINKS INATIVOS */
-.nav_link:hover {
+.nav_link:hover,
+.nav_link.active {
   color: #B77EFF;
 }
 
-/* LINHA INFERIOR NO HOVER (PARA LINKS INATIVOS) */
-.nav_link:hover::after {
-  content: ''; 
-  position: absolute; 
-  left: 0;
-  bottom: 0; 
-  width: 100%; 
-  height: 3px; 
-  background-color: #B77EFF; 
-  border-radius: 10px;
-  transform: scaleX(1);
-  animation: underlineSlide 0.3s ease;
-}
-
-/* ESTADO ATIVO (QUANDO NA PÁGINA) */
-.nav_link.active {
-  color: #B77EFF !important;
-  font-weight: bold;
-}
-
-/* LINHA INFERIOR PARA LINKS ATIVOS */
 .nav_link.active::after {
-  content: ''; 
-  position: absolute; 
+  content: '';
+  position: absolute;
   left: 0;
-  bottom: 0; 
-  width: 100%; 
-  height: 3px; 
-  background-color: #B77EFF; 
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #B77EFF;
   border-radius: 10px;
-  transform: scaleX(1);
 }
 
-/* ANIMAÇÃO PARA O UNDERLINE */
-@keyframes underlineSlide {
-  from {
-    transform: scaleX(0);
-    opacity: 0;
-  }
-  to {
-    transform: scaleX(1);
-    opacity: 1;
-  }
+/* Auth mobile - ESCONDIDO em desktop */
+.auth-mobile {
+  display: none !important;
+  visibility: hidden !important;
 }
 
-/* EFEITO DE "PULSO" SUAVE NO LINK ATIVO */
-.nav_link.active {
-  animation: activePulse 2s infinite;
-}
-
-@keyframes activePulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
-}
-
-.auth {
-  display: flex;
+/* Auth desktop - VISÍVEL em desktop */
+.auth-desktop {
+  display: flex !important;
+  visibility: visible !important;
   align-items: center;
   gap: 20px;
 }
@@ -127,48 +81,39 @@
 .button {
   font-family: "Poppins", sans-serif;
   font-weight: 700;
-  font-style: normal;
   background: linear-gradient(135deg, #B77EFF, #9D5AFF);
   color: white;
   padding: 12px 28px;
   border-radius: 25px;
-  text-decoration: none;
   border: none;
   cursor: pointer;
-  font-size: 1.0rem;
-  transition: all 0.3s ease;
+  font-size: 1rem;
   box-shadow: 0 4px 12px rgba(183, 126, 255, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
-}
-
-.button:hover::before {
-  left: 100%;
 }
 
 .button:hover {
   background: linear-gradient(135deg, #9D5AFF, #8A4AFF);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(183, 126, 255, 0.4);
 }
 
-.button:active {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(183, 126, 255, 0.4);
+/* Overlay - escondido em desktop */
+.mobile-overlay {
+  display: none !important;
+  visibility: hidden !important;
 }
 
-/* ESTILOS PARA OS MODAIS */
+.mobile-overlay.active {
+  display: block !important;
+  visibility: visible !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+}
+
+/* Modais */
 .modal {
   position: fixed;
   top: 0;
@@ -179,20 +124,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(5px);
-  animation: modalFadeIn 0.3s ease;
-}
-
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    backdrop-filter: blur(0px);
-  }
-  to {
-    opacity: 1;
-    backdrop-filter: blur(5px);
-  }
+  z-index: 2000;
 }
 
 .modal-container {
@@ -204,123 +136,123 @@
   max-width: 450px;
   max-height: 90vh;
   overflow-y: auto;
-  position: relative;
-  animation: modalSlideIn 0.3s ease;
 }
 
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-50px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.close {
-  position: absolute;
-  top: 20px;
-  right: 25px;
-  font-size: 32px;
-  font-weight: bold;
-  cursor: pointer;
-  color: #666;
-  transition: all 0.3s ease;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: rgba(183, 126, 255, 0.1);
-}
-
-.close:hover {
-  color: #B77EFF;
-  background: rgba(183, 126, 255, 0.2);
-  transform: rotate(90deg);
-}
-
-/* RESPONSIVIDADE */
-@media (max-width: 768px) {
+/* ============================================= */
+/* MOBILE - TUDO MUDA AQUI                       */
+/* ============================================= */
+@media screen and (max-width: 900px) {
   .header {
-    flex-direction: column;
     padding: 15px 20px;
-    gap: 20px;
-  }
-  
-  .nav {
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-  }
-  
-  .nav_link {
-    font-size: 16px;
-    padding-bottom: 6px;
-  }
-  
-  .auth {
-    gap: 15px;
-  }
-  
-  .button {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-  }
-  
-  .modal-container {
-    padding: 30px 25px;
-    margin: 20px;
-    width: calc(100% - 40px);
-  }
-  
-  .close {
-    top: 15px;
-    right: 20px;
-    font-size: 28px;
-  }
-}
-
-@media (max-width: 480px) {
-  .header {
-    padding: 12px 15px;
   }
   
   .logo img {
     width: 70px;
   }
   
+  /* MOSTRA hamburguer */
+  .mobile-menu-toggle {
+    display: flex !important;
+    visibility: visible !important;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 1001;
+  }
+  
+  .mobile-menu-toggle span {
+    width: 28px;
+    height: 3px;
+    background-color: #B77EFF;
+    border-radius: 3px;
+    display: block;
+  }
+  
+  /* ESCONDE auth desktop */
+  .auth-desktop {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* Menu lateral - FECHADO por padrão */
   .nav {
-    gap: 15px;
+    position: fixed !important;
+    top: 0 !important;
+    left: -320px !important;
+    width: 300px !important;
+    height: 100vh !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    background: white !important;
+    box-shadow: 5px 0 25px rgba(0, 0, 0, 0.2) !important;
+    padding: 100px 30px 30px 30px !important;
+    gap: 20px !important;
+    transition: left 0.3s ease !important;
+    z-index: 999 !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Menu lateral - ABERTO */
+  .nav.mobile-open {
+    left: 0 !important;
   }
   
   .nav_link {
-    font-size: 14px;
-  }
-  
-  .auth {
-    flex-direction: column;
-    gap: 10px;
+    font-size: 18px;
+    padding: 15px 20px;
     width: 100%;
+    border-radius: 10px;
+    display: block;
   }
   
-  .button {
+  .nav_link:hover {
+    background-color: #F5F0FF;
+  }
+  
+  /* MOSTRA auth mobile dentro do nav */
+  .nav .auth-mobile {
+    display: flex !important;
+    visibility: visible !important;
+    flex-direction: column;
+    width: 100%;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 1px solid #E0E0E0;
+  }
+  
+  .auth-mobile .button {
     width: 100%;
     text-align: center;
   }
 }
 
-@media (max-width: 400px) {
-  .logo img {
-    width: 65px;
+/* Mobile pequeno */
+@media screen and (max-width: 480px) {
+  .header {
+    padding: 12px 15px;
   }
-}
-
-@media (max-width: 360px) {
+  
   .logo img {
     width: 60px;
+  }
+  
+  .nav {
+    width: 260px !important;
+    left: -280px !important;
+    padding: 90px 25px 25px 25px !important;
+  }
+  
+  .nav_link {
+    font-size: 16px;
+    padding: 12px 15px;
+  }
+  
+  .button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
   }
 }

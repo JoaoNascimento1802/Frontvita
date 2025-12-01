@@ -14,6 +14,7 @@ const HeaderVet = () => {
   const [showNotifications, setShowNotifications] = useState(false); // Menu de Notificações
   const [notifications, setNotifications] = useState([]); // Lista de notificações
   const [unreadCount, setUnreadCount] = useState(0); // Contador de não lidas
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Menu mobile
   
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -78,14 +79,42 @@ const HeaderVet = () => {
       <div className="logo">
         <NavLink to="/vet/dashboard"><img src={logo} alt="Pet Vita Logo" /></NavLink>
       </div>
+
+      <button 
+        className="mobile-menu-toggle" 
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        aria-label="Menu de navegação"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       
-      <nav className="nav nav-center" aria-label="Navegação do veterinário">
-        <NavLink to="/vet/dashboard" className={({isActive}) => `nav_link ${isActive ? 'active' : ''}`}>Home</NavLink>
-        <NavLink to="/vet/consultas" className={({isActive}) => `nav_link ${isActive ? 'active' : ''}`}>Consultas</NavLink>
-        <NavLink to="/vet/relatorios" className={({isActive}) => `nav_link ${isActive ? 'active' : ''}`}>Relatórios</NavLink>
+      <nav className={`nav ${mobileMenuOpen ? 'mobile-open' : ''}`} aria-label="Navegação do veterinário">
+        <NavLink to="/vet/dashboard" className={({isActive}) => `nav_link ${isActive ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>Home</NavLink>
+        <NavLink to="/vet/consultas" className={({isActive}) => `nav_link ${isActive ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>Consultas</NavLink>
+        <NavLink to="/vet/relatorios" className={({isActive}) => `nav_link ${isActive ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>Relatórios</NavLink>
+        
+        {/* Icons para mobile */}
+        <div className="icons-mobile">
+          <NavLink to="/vet/chat" className="icon-item" onClick={() => setMobileMenuOpen(false)}>
+            <BsChatDots size={24} color="#8D7EFB" />
+            <span className="icon-label">Chat</span>
+          </NavLink>
+          <NavLink to="/vet/perfil" className="icon-item" onClick={() => setMobileMenuOpen(false)}>
+            <img src={user?.imageurl || profileIcon} alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = profileIcon; }} />
+            <span className="icon-label">Meu Perfil</span>
+          </NavLink>
+          <button className="icon-item" onClick={() => { handleLogout(); setMobileMenuOpen(false); }} style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer' }}>
+            <span className="icon-label" style={{ color: '#ff4d4d' }}>Sair</span>
+          </button>
+        </div>
       </nav>
 
-      <div className="icons-container">
+      {/* Overlay */}
+      {mobileMenuOpen && <div className="mobile-overlay active" onClick={() => setMobileMenuOpen(false)} />}
+
+      <div className="icons-container icons-desktop">
         {/* Ícone de Chat */}
         <NavLink to="/vet/chat" className="header-icon" title="Chat">
             <BsChatDots size={26} />

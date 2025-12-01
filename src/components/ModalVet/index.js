@@ -28,15 +28,13 @@ const ModalVet = ({ onClose, switchToUser, switchToRegisterVet, onLoginSuccess, 
   };
 
   return (
-    <div className="modal active" onClick={onClose}>
+    <div className="modal active">
       <div
         className="modal-container"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-vet-title"
-        onClick={(e) => e.stopPropagation()}
       >
-        <button className="close" type="button" aria-label="Fechar" onClick={onClose}>&times;</button>
         <div className="button-group">
           <button className="button" onClick={switchToUser}>Cliente</button>
           <button className="button active">Veterinário</button>

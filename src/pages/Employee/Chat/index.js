@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
-import { IoSend } from 'react-icons/io5';
+import { IoSend, IoArrowBack } from 'react-icons/io5';
 import { firestore } from '../../../services/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import Footer from '../../../components/Footer';
 import HeaderEmployee from '../../../components/HeaderEmployee';
 import './styles.css';
-import '../css/styles.css';
+import '../../User/Chat/css/chat-styles.css';
 
 const EmployeeChat = () => {
     const { user, loading: authLoading } = useAuth();
@@ -85,8 +85,9 @@ const EmployeeChat = () => {
         setNewMessage('');
 
         try {
-            await api.post(`/chat/service/${activeConversation.id}`, originalMessage, {
-                headers: { 'Content-Type': 'text/plain' }
+            // CORREÇÃO: Removido o header manual
+            await api.post(`/chat/service/${activeConversation.id}`, {
+                content: originalMessage
             });
         } catch (err) {
             console.error("Erro ao enviar mensagem:", err);
@@ -104,12 +105,12 @@ const EmployeeChat = () => {
                     <p>Comunique-se com os tutores dos pets agendados.</p>
                 </div>
                 <div className="employee-chat-container">
-                    <div className="chat-container">
-                        <div className="chat-sidebar">
-                            <div className="sidebar-header">
+                    <div className={`user-chat-container ${activeConversation ? 'chat-active' : ''}`}>
+                        <div className="user-chat-sidebar">
+                            <div className="user-sidebar-header">
                                 <h3>Atendimentos</h3>
                             </div>
-                            <div className="contact-list">
+                            <div className="user-contact-list">
                                 {loadingConversations ? (
                                     <p style={{ padding: '20px', textAlign: 'center' }}>Carregando...</p>
                                 ) : conversations.length === 0 ? (
@@ -120,13 +121,12 @@ const EmployeeChat = () => {
                                     conversations.map(conv => (
                                         <div 
                                             key={conv.id} 
-                                            className={`contact-item ${activeConversation?.id === conv.id ? 'active' : ''}`}
+                                            className={`user-contact-item ${activeConversation?.id === conv.id ? 'active' : ''}`}
                                             onClick={() => handleConversationClick(conv)}
                                         >
-                                            <div className="card-avatar-placeholder">{conv.avatarChar}</div>
                                             <div className="contact-info">
-                                                <span className="contact-name">{conv.displayName}</span>
-                                                <span className="contact-last-message">{conv.subTitle}</span>
+                                                <span style={{ fontWeight: 600, color: '#333' }}>{conv.displayName}</span>
+                                                <span style={{ fontSize: '0.9rem', color: '#888' }}>{conv.subTitle}</span>
                                             </div>
                                         </div>
                                     ))
@@ -134,20 +134,27 @@ const EmployeeChat = () => {
                             </div>
                         </div>
 
-                        <div className="chat-main">
+                        <div className="user-chat-main">
                             {activeConversation ? (
                                 <>
-                                    <div className="chat-header">
-                                        <span className="contact-name">{activeConversation.displayName}</span>
+                                    <div className="user-chat-header">
+                                        <button 
+                                            className="back-to-list-btn"
+                                            onClick={() => setActiveConversation(null)}
+                                            aria-label="Voltar para lista de conversas"
+                                        >
+                                            <IoArrowBack size={24} />
+                                        </button>
+                                        <span style={{ fontWeight: 600, color: 'white' }}>{activeConversation.displayName}</span>
                                     </div>
-                                    <div className="message-area">
+                                    <div className="user-message-area">
                                         {loadingMessages ? (
                                             <p>Carregando...</p>
                                         ) : (
                                             messages.map(msg => (
                                                 <div 
                                                     key={msg.id} 
-                                                    className={`message ${msg.senderId === user.id ? 'sent' : 'received'}`}
+                                                    className={`user-message ${msg.senderId === user.id ? 'sent' : 'received'}`}
                                                 >
                                                     <strong>{msg.senderName}: </strong>
                                                     {msg.content}
@@ -155,7 +162,7 @@ const EmployeeChat = () => {
                                             ))
                                         )}
                                     </div>
-                                    <form className="message-input-area" onSubmit={handleSendMessage}>
+                                    <form className="user-message-input-area" onSubmit={handleSendMessage}>
                                         <input 
                                             type="text" 
                                             placeholder="Digite sua mensagem..." 
@@ -168,8 +175,8 @@ const EmployeeChat = () => {
                                     </form>
                                 </>
                             ) : (
-                                <div className="no-chat-selected">
-                                    Selecione um atendimento para iniciar o chat
+                                <div className="user-message-area" style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                    <p style={{ color: '#888', fontSize: '1.2rem' }}>Selecione um atendimento para iniciar o chat</p>
                                 </div>
                             )}
                         </div>
