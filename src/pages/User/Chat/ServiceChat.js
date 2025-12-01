@@ -1,4 +1,3 @@
-// src/pages/User/Chat/ServiceChat.js
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import HeaderComCadastro from '../../../components/HeaderComCadastro';
@@ -8,10 +7,10 @@ import { useAuth } from '../../../context/AuthContext';
 import { IoSend } from 'react-icons/io5';
 import { firestore } from '../../../services/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import './css/chat-styles.css';
+import './css/chat-styles.css'; // Garanta que seu CSS com as classes .user-* está aqui
 
 const ServiceChat = () => {
-    const { serviceScheduleId } = useParams(); // ID do Serviço
+    const { serviceScheduleId } = useParams();
     const { user } = useAuth();
     const messagesEndRef = useRef(null);
 
@@ -19,30 +18,48 @@ const ServiceChat = () => {
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [chatPartnerName, setChatPartnerName] = useState('Carregando...');
     
+    const [chatPartnerName, setChatPartnerName] = useState('Carregando...');
+    const [chatRoomId, setChatRoomId] = useState(null);
+
+    // 1. Busca Detalhes do Serviço (UUID e Nome do Parceiro)
     useEffect(() => {
-        const fetchPartnerName = async () => {
+        const fetchServiceDetails = async () => {
             if (!user) return;
             try {
-                // Rota da API de funcionário (precisa estar criada no backend)
-                const serviceResponse = await api.get(`/api/employee/schedules/${serviceScheduleId}`);
-                const partner = user.role === 'USER' ? serviceResponse.data.employeeName : serviceResponse.data.clientName;
+                const response = await api.get(`/api/service-schedules/${serviceScheduleId}`);
+                
+                // Salva o UUID da sala
+                setChatRoomId(response.data.chatRoomId);
+                
+                const partner = user.role === 'USER' 
+                    ? response.data.employeeName 
+                    : response.data.clientName;
+                
                 setChatPartnerName(partner || "Desconhecido");
-             } catch (err) {
+
+            } catch (err) {
                 console.error("Erro ao buscar detalhes do serviço", err);
                 setChatPartnerName("Desconhecido");
+                setError("Não foi possível carregar os dados do chat.");
             }
         };
-        fetchPartnerName();
-     }, [serviceScheduleId, user]);
+        fetchServiceDetails();
+    }, [serviceScheduleId, user]);
 
+    // 2. Conecta ao Firebase (Usando UUID)
     useEffect(() => {
-        if (!serviceScheduleId) return;
+        if (!serviceScheduleId || chatRoomId === undefined) return;
+        
         setLoading(true);
+
+        const roomId = chatRoomId || serviceScheduleId;
+        const collectionName = chatRoomId ? 'chats' : 'services';
+        
+        console.log(`User Service Chat: Conectando em ${collectionName}/${roomId}`);
+
         const q = query(
-            // Ouve a nova coleção "services"
-            collection(firestore, `services/${serviceScheduleId}/mensagens`), 
+            collection(firestore, `${collectionName}/${roomId}/mensagens`),
             orderBy("timestamp", "asc")
         );
 
@@ -52,28 +69,31 @@ const ServiceChat = () => {
             setLoading(false);
         }, (err) => {
             console.error("Erro ao escutar mensagens:", err);
-            setError("Não foi possível carregar o chat.");
+            setError("Não foi possível carregar o histórico.");
             setLoading(false);
         });
+
         return () => unsubscribe();
-    }, [serviceScheduleId]);
+    }, [serviceScheduleId, chatRoomId]);
     
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
+    // 3. Envia Mensagem (JSON)
     const handleSendMessage = async (e) => {
         e.preventDefault();
         if (newMessage.trim() === '') return;
+        
         const originalMessage = newMessage;
         setNewMessage('');
+        
         try {
-            // --- ROTA ATUALIZADA ---
-            await api.post(`/chat/service/${serviceScheduleId}`, originalMessage, {
-                headers: { 'Content-Type': 'text/plain' }
+            await api.post(`/chat/service/${serviceScheduleId}`, {
+                content: originalMessage
             });
         } catch (err) {
-             console.error("Erro ao enviar mensagem:", err);
+            console.error("Erro ao enviar mensagem:", err);
             setNewMessage(originalMessage);
             alert("Não foi possível enviar a mensagem.");
         }
@@ -83,29 +103,28 @@ const ServiceChat = () => {
         <div className="user-chat-page">
             <HeaderComCadastro />
             <div className="user-chat-container">
-                <div className="user-chat-sidebar">
+                 <div className="user-chat-sidebar">
                     <div className="user-sidebar-header">
                         <h3>Conversa</h3>
                     </div>
                     <div className="user-contact-list">
                         <div className="user-contact-item">
-                            <span style={{ fontWeight: 600, color: '#333' }}>Serviço #{serviceScheduleId}</span>
+                             <div className="contact-info">
+                                <span className="contact-name">Serviço #{serviceScheduleId}</span>
+                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="user-chat-main">
+                 <div className="user-chat-main">
                     <div className="user-chat-header">
-                        <span style={{ fontWeight: 600, color: '#333' }}>{chatPartnerName} (Funcionário)</span>
+                        <span className="contact-name">{chatPartnerName} (Funcionário)</span>
                     </div>
-                    <div className="user-message-area">
+                     <div className="user-message-area">
                         {loading && <p>Carregando histórico...</p>}
-                        {error && <p style={{ color: '#d32f2f' }}>{error}</p>}
+                        {error && <p className="error-message">{error}</p>}
                         {!loading && messages.map(msg => (
-                            <div 
-                                key={msg.id} 
-                                className={`user-message ${msg.senderId === user.id ? 'sent' : 'received'}`}
-                            >
+                            <div key={msg.id} className={`user-message ${msg.senderId === user.id ? 'sent' : 'received'}`}>
                                 <strong>{msg.senderName}: </strong>
                                 {msg.content}
                             </div>
@@ -119,13 +138,11 @@ const ServiceChat = () => {
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                         />
-                        <button type="submit">
-                            <IoSend size={22} />
-                        </button>
+                        <button type="submit"> <IoSend size={22} /> </button>
                     </form>
                 </div>
             </div>
-            <Footer />
+             <Footer />
         </div>
     );
 };
