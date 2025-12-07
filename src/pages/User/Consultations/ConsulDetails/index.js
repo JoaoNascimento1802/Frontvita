@@ -3,7 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import HeaderComCadastro from '../../../../components/HeaderComCadastro';
 import Footer from '../../../../components/Footer';
+import ConfirmModal from '../../../../components/ConfirmModal';
 import api from '../../../../services/api';
+import { toast } from 'react-toastify';
 import './css/styles.css';
 
 const ConsulDetails = () => {
@@ -12,6 +14,7 @@ const ConsulDetails = () => {
     
     const [consulta, setConsulta] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [showCancelModal, setShowCancelModal] = useState(false);
 
     useEffect(() => {
         const fetchConsulta = async () => {
@@ -31,15 +34,15 @@ const ConsulDetails = () => {
     
 
     const handleCancelConsultation = async () => {
-        if (window.confirm('Tem certeza que deseja cancelar esta consulta?')) {
-            try {
-                await api.post(`/consultas/${consultaId}/cancel`);
-                alert('Consulta cancelada com sucesso.');
-                navigate('/consultas');
-            } catch (error) {
-                alert('Não foi possível cancelar a consulta.');
-                console.error(error);
-            }
+        try {
+            await api.post(`/consultas/${consultaId}/cancel`);
+            toast.success('Consulta cancelada com sucesso.');
+            navigate('/consultas');
+        } catch (error) {
+            toast.error('Não foi possível cancelar a consulta.');
+            console.error(error);
+        } finally {
+            setShowCancelModal(false);
         }
     };
 
@@ -79,11 +82,23 @@ const ConsulDetails = () => {
                          </div>
                          <div className="details-actions">
                             <Link to="/consultas" className="back-button">Voltar</Link>
-                            <button type="button" className="decline-button" onClick={handleCancelConsultation}>Cancelar Consulta</button>
+                            <button type="button" className="decline-button" onClick={() => setShowCancelModal(true)}>Cancelar Consulta</button>
                          </div>
                     </form>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={showCancelModal}
+                title="Cancelar Consulta"
+                message="Tem certeza que deseja cancelar esta consulta?"
+                onConfirm={handleCancelConsultation}
+                onCancel={() => setShowCancelModal(false)}
+                confirmText="Sim, cancelar"
+                cancelText="Não"
+                type="warning"
+            />
+
             <Footer />
          </div>
     );

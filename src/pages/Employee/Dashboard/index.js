@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Footer from '../../../components/Footer';
 import api from '../../../services/api';
 import { toast } from 'react-toastify';
-import { FaCalendarCheck, FaTasks } from 'react-icons/fa';
+import { FaCalendarCheck, FaTasks, FaStar } from 'react-icons/fa';
 import '../css/styles.css';
 import './css/styles.css';
 
 const EmployeeDashboard = () => {
     const [summary, setSummary] = useState({ servicesToday: 0, servicesFinalizedThisMonth: 0 });
+    const [rating, setRating] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -23,7 +24,18 @@ const EmployeeDashboard = () => {
                 setLoading(false);
             }
         };
+        
+        const fetchRating = async () => {
+            try {
+                const res = await api.get('/api/employee/me/rating-summary');
+                setRating(res.data);
+            } catch(e) {
+                console.error("Erro ao buscar avaliação:", e);
+            }
+        };
+        
         fetchSummary();
+        fetchRating();
     }, []);
 
     return (
@@ -55,6 +67,24 @@ const EmployeeDashboard = () => {
                         </div>
                     )}
                 </div>
+
+                {/* --- EXIBIÇÃO DA NOTA --- */}
+                <section className="rating-section">
+                    <div className="rating-card-dashboard">
+                        <div className="rating-icon-wrapper">
+                            <FaStar className="rating-star-icon" />
+                        </div>
+                        <div className="rating-info">
+                            <div className="rating-score">
+                                {rating > 0 ? rating.toFixed(1) : 'N/A'}
+                            </div>
+                            <div className="rating-label">
+                                Sua avaliação
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                {/* ------------------------ */}
             </main>
             <Footer />
         </div>

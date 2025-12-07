@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import HeaderAdmin from '../../../components/HeaderAdmin/HeaderAdmin';
 import Footer from '../../../components/Footer';
 import api from '../../../services/api';
+import { toast } from 'react-toastify';
 import { FaChartBar, FaUserPlus, FaFileMedicalAlt, FaDownload } from 'react-icons/fa';
 import './css/Relatorios.css';
 
@@ -114,7 +115,7 @@ const AdminRelatorios = () => {
             link.parentNode.removeChild(link);
 
         } catch (error) {
-            alert('Não foi possível gerar o relatório em PDF.');
+            toast.error('Não foi possível gerar o relatório em PDF.');
             console.error("Erro ao gerar PDF:", error);
         } finally {
             setPdfLoading(false);

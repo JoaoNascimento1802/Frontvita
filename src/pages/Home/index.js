@@ -8,6 +8,7 @@ import celular from '../../assets/images/Home/Celular.png';
 import gato_maltratado from '../../assets/images/Home/Gato_mal_tratado.jpg'; 
 import pontos from '../../assets/images/Home/Pontos.png'; 
 import Footer from '../../components/Footer';
+import { toast } from 'react-toastify';
 import './css/styles.css';
 
 import { FaPaw, FaHeart, FaCalendarAlt, FaUserMd } from 'react-icons/fa'; 
@@ -68,7 +69,7 @@ const Home = () => {
     if (!user) {
       // Este comportamento está correto. O usuário deve usar o botão "Login" no header,
       // que é o componente que controla a exibição do modal.
-      alert('Você precisa logar primeiro para marcar consulta');
+      toast.info('Você precisa logar primeiro para marcar consulta');
       return;
     }
     // CORREÇÃO: Navega para a tela de ESCOLHA, e não direto para a consulta.

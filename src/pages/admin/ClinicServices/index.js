@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import HeaderAdmin from '../../../components/HeaderAdmin/HeaderAdmin';
 import Footer from '../../../components/Footer';
+import ConfirmModal from '../../../components/ConfirmModal';
 import api from '../../../services/api';
 import { FaEdit, FaTrash, FaPlus, FaSave, FaTimes } from 'react-icons/fa';
 import './styles.css';
@@ -20,6 +21,7 @@ const ClinicServices = () => {
     const [loading, setLoading] = useState(true);
     const [editingId, setEditingId] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, serviceId: null });
     // Estado inicial padronizado
     const initialFormData = { name: '', description: '', price: '', isMedicalService: 'false', speciality: 'ESTETICA' };
     const [formData, setFormData] = useState(initialFormData);
@@ -92,15 +94,19 @@ const ClinicServices = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Tem certeza que deseja excluir este serviço?')) {
-            try {
-                 await api.delete(`/admin/clinic-services/${id}`);
-                toast.success('Serviço excluído com sucesso!');
-                fetchServices(); // Atualiza a lista
-            } catch (err) {
-                toast.error('Erro ao excluir o serviço.');
-            }
+    const handleDelete = (id) => {
+        setConfirmDelete({ isOpen: true, serviceId: id });
+    };
+
+    const confirmDeleteService = async () => {
+        try {
+            await api.delete(`/admin/clinic-services/${confirmDelete.serviceId}`);
+            toast.success('Serviço excluído com sucesso!');
+            fetchServices();
+        } catch (err) {
+            toast.error('Erro ao excluir o serviço.');
+        } finally {
+            setConfirmDelete({ isOpen: false, serviceId: null });
         }
     };
 
@@ -210,6 +216,18 @@ const ClinicServices = () => {
                     </tbody>
                 </table>
             </main>
+
+            <ConfirmModal
+                isOpen={confirmDelete.isOpen}
+                title="Excluir Serviço"
+                message="Tem certeza que deseja excluir este serviço? Esta ação é irreversível."
+                onConfirm={confirmDeleteService}
+                onCancel={() => setConfirmDelete({ isOpen: false, serviceId: null })}
+                confirmText="Excluir"
+                cancelText="Cancelar"
+                type="danger"
+            />
+
              <Footer />
         </div>
     );

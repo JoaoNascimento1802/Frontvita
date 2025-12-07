@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import HeaderAdmin from '../../../components/HeaderAdmin/HeaderAdmin';
 import Footer from '../../../components/Footer';
+import ConfirmModal from '../../../components/ConfirmModal';
 import api from '../../../services/api';
 import { FaEdit, FaTrash, FaPlus, FaSearch, FaSave, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import AddPatientModal from './AddPatientModal';
@@ -16,6 +17,7 @@ const PacientesList = () => {
     const [editFormData, setEditFormData] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, patient: null });
 
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -92,19 +94,20 @@ const PacientesList = () => {
         }
     };
 
-    const handleDelete = async (paciente) => {
-        if (window.confirm(`Tem certeza que deseja excluir ${paciente.username}?`)) {
-            try {
-                // --- CORREÇÃO APLICADA AQUI ---
-                // O erro 'id is not defined' foi corrigido.
-                // Trocado 'id' por 'paciente.id'.
-                await api.delete(`/admin/users/${paciente.id}`);
-                fetchPacientes(); 
-                toast.success('Paciente excluído com sucesso!');
-            } catch (err) {
-                toast.error('Erro ao excluir paciente.');
-                console.error(err);
-            }
+    const handleDelete = (paciente) => {
+        setConfirmDelete({ isOpen: true, patient: paciente });
+    };
+
+    const confirmDeletePatient = async () => {
+        try {
+            await api.delete(`/admin/users/${confirmDelete.patient.id}`);
+            fetchPacientes();
+            toast.success('Paciente excluído com sucesso!');
+        } catch (err) {
+            toast.error('Erro ao excluir paciente.');
+            console.error(err);
+        } finally {
+            setConfirmDelete({ isOpen: false, patient: null });
         }
     };
 
@@ -203,6 +206,17 @@ const PacientesList = () => {
             </main>
             
             {isModalOpen && <AddPatientModal onClose={() => setIsModalOpen(false)} onPatientAdded={handlePatientAdded} />}
+
+            <ConfirmModal
+                isOpen={confirmDelete.isOpen}
+                title="Excluir Paciente"
+                message={`Tem certeza que deseja excluir ${confirmDelete.patient?.username}? Esta ação é irreversível.`}
+                onConfirm={confirmDeletePatient}
+                onCancel={() => setConfirmDelete({ isOpen: false, patient: null })}
+                confirmText="Excluir"
+                cancelText="Cancelar"
+                type="danger"
+            />
             
             <Footer />
         </div>

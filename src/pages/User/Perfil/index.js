@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
+import { toast } from 'react-toastify';
 import HeaderComCadastro from '../../../components/HeaderComCadastro';
 import Footer from '../../../components/Footer';
 import ImageCropper from '../../../components/ImageCropper/ImageCropper';
@@ -87,7 +88,7 @@ const ProfileScreen = () => {
             // 3. ATUALIZA O CONTEXTO (usuário e token)
             updateTokenAndUser(response.data);
 
-            alert('Perfil atualizado com sucesso!');
+            toast.success('Perfil atualizado com sucesso!');
             setIsEditing(false);
             setHasChanges(false);
             setImageFile(null);
@@ -100,7 +101,7 @@ const ProfileScreen = () => {
             fetchUserData(); 
 
         } catch (err) {
-            alert('Erro ao salvar as alterações.');
+            toast.error('Erro ao salvar as alterações.');
             console.error('Erro ao salvar:', err);
         } finally {
             setIsSaving(false);

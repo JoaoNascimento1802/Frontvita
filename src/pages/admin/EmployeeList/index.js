@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import HeaderAdmin from '../../../components/HeaderAdmin/HeaderAdmin';
 import Footer from '../../../components/Footer';
+import ConfirmModal from '../../../components/ConfirmModal';
 import api from '../../../services/api';
 import { FaEdit, FaTrash, FaPlus, FaSearch, FaSave, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import AddEmployeeModal from './AddEmployeeModal';
@@ -17,6 +18,7 @@ const EmployeeList = () => {
     const [editFormData, setEditFormData] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, employee: null });
 
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -90,16 +92,20 @@ const EmployeeList = () => {
         }
     };
 
-    const handleDelete = async (employee) => {
-        if (window.confirm(`Tem certeza que deseja excluir ${employee.username}?`)) {
-            try {
-                await api.delete(`/admin/users/${employee.id}`);
-                fetchEmployees();
-                toast.success('Funcionário excluído com sucesso!');
-            } catch (err) {
-                toast.error('Erro ao excluir funcionário.');
-                console.error(err);
-            }
+    const handleDelete = (employee) => {
+        setConfirmDelete({ isOpen: true, employee });
+    };
+
+    const confirmDeleteEmployee = async () => {
+        try {
+            await api.delete(`/admin/users/${confirmDelete.employee.id}`);
+            fetchEmployees();
+            toast.success('Funcionário excluído com sucesso!');
+        } catch (err) {
+            toast.error('Erro ao excluir funcionário.');
+            console.error(err);
+        } finally {
+            setConfirmDelete({ isOpen: false, employee: null });
         }
     };
 
@@ -207,6 +213,17 @@ const EmployeeList = () => {
             </main>
 
             {isModalOpen && <AddEmployeeModal onClose={() => setIsModalOpen(false)} onEmployeeAdded={handleEmployeeAdded} />}
+
+            <ConfirmModal
+                isOpen={confirmDelete.isOpen}
+                title="Excluir Funcionário"
+                message={`Tem certeza que deseja excluir ${confirmDelete.employee?.username}? Esta ação é irreversível.`}
+                onConfirm={confirmDeleteEmployee}
+                onCancel={() => setConfirmDelete({ isOpen: false, employee: null })}
+                confirmText="Excluir"
+                cancelText="Cancelar"
+                type="danger"
+            />
 
             <Footer />
         </div>

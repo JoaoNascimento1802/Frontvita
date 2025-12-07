@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import HeaderVet from '../../../components/HeaderVet/HeaderVet';
 import Footer from '../../../components/Footer';
 import api from '../../../services/api'; 
+import { FaStar } from 'react-icons/fa';
 
 // Imagens para os cards
 import mainImage from '../../../assets/images/Vet/Consultas.jpeg';
@@ -14,6 +15,7 @@ import '../css/styles.css';
 
 const Dashboard = () => {
     const [vetName, setVetName] = useState("Veterinário(a)");
+    const [vetProfile, setVetProfile] = useState(null);
     const [pendingCount, setPendingCount] = useState(0);
     const [loading, setLoading] = useState(true);
 
@@ -22,6 +24,10 @@ const Dashboard = () => {
              try {
                 const userResponse = await api.get('/users/me');
                 setVetName(userResponse.data.username);
+
+                // Busca perfil do veterinário com avaliações
+                const profileRes = await api.get('/veterinary/me');
+                setVetProfile(profileRes.data);
 
                 // --- CORREÇÃO AQUI ---
                 // A rota /consultas/my-consultations foi trocada para /consultas/vet/my-consultations
@@ -79,6 +85,24 @@ const Dashboard = () => {
                         </Link>
                      </div>
                 </section>
+
+                {/* --- EXIBIÇÃO DA NOTA --- */}
+                <section className="rating-section">
+                    <div className="rating-card-dashboard">
+                        <div className="rating-icon-wrapper">
+                            <FaStar className="rating-star-icon" />
+                        </div>
+                        <div className="rating-info">
+                            <div className="rating-score">
+                                {vetProfile?.averageRating ? vetProfile.averageRating.toFixed(1) : 'N/A'}
+                            </div>
+                            <div className="rating-label">
+                                {vetProfile?.ratingCount || 0} avaliações
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                {/* ------------------------ */}
             </main>
             <Footer />
         </div>

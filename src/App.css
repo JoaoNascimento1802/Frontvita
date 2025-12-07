@@ -96,3 +96,64 @@
     padding-top: 80px;
   }
 }
+
+/* Estilos customizados para React Toastify */
+.Toastify__toast--success {
+  background-color: white !important;
+  color: #333 !important;
+  border: 3px solid #07bc0c !important;
+  box-shadow: 0 2px 8px rgba(7, 188, 12, 0.2) !important;
+}
+
+.Toastify__toast--success .Toastify__toast-icon {
+  color: #07bc0c !important;
+}
+
+.Toastify__toast--success .Toastify__progress-bar {
+  background: #07bc0c !important;
+}
+
+.Toastify__toast--error {
+  background-color: white !important;
+  color: #333 !important;
+  border: 3px solid #e74c3c !important;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2) !important;
+}
+
+.Toastify__toast--error .Toastify__toast-icon {
+  color: #e74c3c !important;
+}
+
+.Toastify__toast--error .Toastify__progress-bar {
+  background: #e74c3c !important;
+}
+
+.Toastify__toast--warning {
+  background-color: white !important;
+  color: #333 !important;
+  border: 3px solid #f39c12 !important;
+  box-shadow: 0 2px 8px rgba(243, 156, 18, 0.2) !important;
+}
+
+.Toastify__toast--warning .Toastify__toast-icon {
+  color: #f39c12 !important;
+}
+
+.Toastify__toast--warning .Toastify__progress-bar {
+  background: #f39c12 !important;
+}
+
+.Toastify__toast--info {
+  background-color: white !important;
+  color: #333 !important;
+  border: 3px solid #3498db !important;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2) !important;
+}
+
+.Toastify__toast--info .Toastify__toast-icon {
+  color: #3498db !important;
+}
+
+.Toastify__toast--info .Toastify__progress-bar {
+  background: #3498db !important;
+}

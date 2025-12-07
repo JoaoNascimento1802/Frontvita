@@ -6,6 +6,7 @@ import Footer from '../../../components/Footer';
 import ImageCropper from '../../../components/ImageCropper/ImageCropper';
 import profileIcon from '../../../assets/images/Perfil/perfilIcon.png';
 import { FaPencilAlt } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import '../css/styles.css';
 import { formatEnumLabel } from '../../../utils/format';
 
@@ -75,20 +76,22 @@ const VetPerfil = () => {
                 specialityenum: editData.specialityenum, phone: editData.phone, rg: editData.rg,
                 imageurl: imagePreview
             };
-            await api.put(`/admin/veterinarians/${vetData.id}`, updateDTO);
+            await api.put('/veterinary/me', updateDTO);
 
             if (imageFile) {
                 const uploadFormData = new FormData();
                 uploadFormData.append('file', imageFile);
-                await api.post(`/upload/veterinary/${vetData.id}`, uploadFormData);
+                await api.patch('/veterinary/me/photo', uploadFormData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
             }
-            alert('Perfil atualizado com sucesso!');
+            toast.success('Perfil atualizado com sucesso!');
             setIsEditing(false);
             setHasChanges(false);
             setImageFile(null);
             await fetchVetData();
         } catch (err) {
-            alert('Erro ao salvar as alterações.');
+            toast.error('Erro ao salvar as alterações.');
             console.error(err.response?.data || err);
         } finally {
             setIsSaving(false);

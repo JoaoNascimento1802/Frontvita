@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../context/AuthContext';
 import api from '../../../../services/api';
+import { toast } from 'react-toastify';
 import HeaderComCadastro from '../../../../components/HeaderComCadastro';
 import Footer from '../../../../components/Footer';
 import ImageCropper from '../../../../components/ImageCropper/ImageCropper';
@@ -126,8 +127,6 @@ const AddPet = () => {
             dataToSend[breedKey] = selectedBreed;
         }
         
-        console.log("DADOS FINAIS ENVIADOS PARA A API:", dataToSend);
-        
         // Cria o pet primeiro
         const petResponse = await api.post('/pets', dataToSend);
         const petId = petResponse.data.id;
@@ -139,7 +138,7 @@ const AddPet = () => {
           await api.post(`/upload/pet/${petId}`, uploadFormData);
         }
 
-        alert('Pet cadastrado com sucesso!');
+        toast.success('Pet cadastrado com sucesso!');
         navigate('/pets');
     } catch (error) {
         console.error("Erro ao cadastrar pet:", error.response?.data || error);

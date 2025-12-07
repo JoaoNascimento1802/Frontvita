@@ -1,10 +1,9 @@
 // src/pages/Employee/Perfil/index.js
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
 import HeaderEmployee from '../../../components/HeaderEmployee/index';
 import Footer from '../../../components/Footer';
-import ScheduleDisplay from '../../../components/ScheduleDisplay/ScheduleDisplay';
 import ImageCropper from '../../../components/ImageCropper/ImageCropper';
 import profileIcon from '../../../assets/images/Perfil/perfilIcon.png';
 import { FaPencilAlt } from 'react-icons/fa';
@@ -25,8 +24,6 @@ const EmployeePerfil = () => {
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(profileIcon);
     const [hasChanges, setHasChanges] = useState(false);
-    const [schedules, setSchedules] = useState([]);
-    const [loadingSchedules, setLoadingSchedules] = useState(true);
 
     const fetchUserData = useCallback(async () => {
          if (!user) return;
@@ -47,25 +44,6 @@ const EmployeePerfil = () => {
     useEffect(() => {
         fetchUserData();
     }, [fetchUserData]);
-
-    useEffect(() => {
-         if (user) {
-            const fetchSchedules = async () => {
-                setLoadingSchedules(true);
-                try {
-                    // Busca os horários do funcionário
-                    const response = await api.get(`/admin/schedules/employee/${user.id}`);
-                    setSchedules(response.data);
-                } catch (error) {
-                    toast.error("Não foi possível carregar seus horários de trabalho.");
-                    console.error("Erro ao carregar horários do funcionário", error);
-                } finally {
-                    setLoadingSchedules(false);
-                }
-            };
-            fetchSchedules();
-        }
-    }, [user]);
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -106,7 +84,7 @@ const EmployeePerfil = () => {
             // 3. ATUALIZA O CONTEXTO (usuário e token)
             updateTokenAndUser(response.data);
 
-            alert('Perfil atualizado com sucesso!');
+            toast.success('Perfil atualizado com sucesso!');
             setIsEditing(false);
             setHasChanges(false);
             setImageFile(null);
@@ -117,7 +95,7 @@ const EmployeePerfil = () => {
             fetchUserData(); // Recarrega os dados
             
         } catch (err) {
-            alert('Erro ao salvar as alterações.');
+            toast.error('Erro ao salvar as alterações.');
             console.error('Erro ao salvar:', err);
         } finally {
             setIsSaving(false);
@@ -186,11 +164,6 @@ const EmployeePerfil = () => {
                             </div>
                        </div>
                     </form>
-                </div>
-
-                {/* Container adicional para exibir os horários de trabalho */}
-                 <div className="profile-container" style={{marginTop: '40px'}}>
-                     <ScheduleDisplay schedules={schedules} loading={loadingSchedules} />
                 </div>
             </>
         );

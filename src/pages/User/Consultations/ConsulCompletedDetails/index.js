@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import HeaderComCadastro from '../../../../components/HeaderComCadastro'; 
 import Footer from '../../../../components/Footer';
 import api from '../../../../services/api';
+import { toast } from 'react-toastify';
 import { FaStar, FaRegStar, FaFileMedical, FaPrescriptionBottleAlt, FaPaperclip } from 'react-icons/fa';
 import '../css/styles.css'; 
 import { formatEnumLabel } from '../../../../utils/format';
@@ -27,6 +28,22 @@ const ConsulCompleteDetails = () => {
                 const response = await api.get(`/consultas/${consultaId}`);
                 setConsulta(response.data);
 
+                // --- 2. NOVA LÓGICA DE AVALIAÇÃO (Rota Centralizada) ---
+                if (response.data.veterinaryId) {
+                    try {
+                        // Nova URL: /api/ratings/veterinary/{vetId}
+                        const rateRes = await api.get(`/api/ratings/veterinary/${response.data.veterinaryId}`);
+                        if (rateRes.data) {
+                            setRating(rateRes.data.rating);
+                            setComment(rateRes.data.comment);
+                        }
+                    } catch(e) {
+                        // Ignora 404 (ainda não avaliou) ou erros silenciosos
+                        console.log("Sem avaliação prévia ou erro ao buscar.");
+                    }
+                }
+                // -------------------------------------------------------
+
                 // 2. Se houver ID de prontuário, busca os detalhes (anexos e prescrições)
                 if (response.data.medicalRecordId) {
                     try {
@@ -48,15 +65,16 @@ const ConsulCompleteDetails = () => {
 
     const handleSubmitRating = async () => {
         if (rating === 0) {
-            alert('Por favor, selecione de 1 a 5 estrelas.');
+            toast.warning('Por favor, selecione de 1 a 5 estrelas.');
             return;
         }
         try {
             const veterinaryId = consulta?.veterinaryId; 
-            await api.post(`/veterinary/${veterinaryId}/rate`, { rating, comment });
-            alert('Avaliação enviada com sucesso!');
+            // Nova URL de POST: /api/ratings/veterinary/{vetId}
+            await api.post(`/api/ratings/veterinary/${veterinaryId}`, { rating, comment });
+            toast.success('Avaliação enviada com sucesso!');
         } catch (error) {
-            alert('Falha ao enviar avaliação.');
+            toast.error('Falha ao enviar avaliação.');
         }
     };
 
@@ -146,7 +164,7 @@ const ConsulCompleteDetails = () => {
                             </div>
                             <div className="rating-controls">
                                  <div className="stars">
-                                {[...Array(5)].map((star, index) => {
+                                {[...Array(5)].map((_, index) => {
                                     const ratingValue = index + 1;
                                     return (
                                         <button

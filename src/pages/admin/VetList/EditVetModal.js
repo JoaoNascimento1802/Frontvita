@@ -1,6 +1,7 @@
 // src/pages/admin/VetList/EditVetModal.js
 import React, { useState, useEffect } from 'react';
 import api from '../../../services/api';
+import { toast } from 'react-toastify';
 import './css/VetList.css'; // Reutiliza o mesmo CSS
 import profileIcon from '../../../assets/images/Header/perfilIcon.png';
 
@@ -71,7 +72,7 @@ const EditVetModal = ({ vet, onClose, onVetUpdated }) => {
                 await api.post(`/upload/veterinary/${vet.id}`, uploadFormData);
             }
             
-            alert('Veterinário atualizado com sucesso!');
+            toast.success('Veterinário atualizado com sucesso!');
             onVetUpdated(); // Fecha o modal e atualiza a lista
             
         } catch (err) {

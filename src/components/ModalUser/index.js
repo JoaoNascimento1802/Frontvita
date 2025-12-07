@@ -1,5 +1,6 @@
 // components/ModalUser/index.js
 import React, { useState } from 'react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import './css/styles.css';
 import logo from '../../assets/images/Header/LogoPet_vita(Atualizado).png';
 
@@ -9,6 +10,7 @@ const ModalUser = ({ onClose, switchToVet, switchToRegisterUser, onLoginSuccess,
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -57,14 +59,34 @@ const ModalUser = ({ onClose, switchToVet, switchToRegisterUser, onLoginSuccess,
           </div>
           <div className="input-group">
             <label htmlFor="senha-user">Senha</label>
-            <input 
-              type="password" 
-              id="senha-user"
-              placeholder='Digite a sua senha'
-              required 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-            />
+            <div style={{ position: 'relative' }}>
+              <input 
+                type={showPassword ? "text" : "password"}
+                id="senha-user"
+                placeholder='Digite a sua senha'
+                required 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                style={{ paddingRight: '40px' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
           <div className="options">
             <div className="remember-me">

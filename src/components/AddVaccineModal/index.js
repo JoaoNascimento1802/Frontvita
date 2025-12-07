@@ -33,8 +33,16 @@ const AddVaccineModal = ({ petId, onClose, onSuccess, vaccineToEdit }) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const today = new Date().toISOString().split('T')[0];
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Impede data de aplicação no futuro
+        if (formData.applicationDate > today) {
+            toast.warn("A data de aplicação não pode ser uma data futura.");
+            return;
+        }
         
         if (formData.nextDoseDate && formData.nextDoseDate < formData.applicationDate) {
             toast.warn("A data da próxima dose não pode ser anterior à aplicação.");
@@ -109,7 +117,7 @@ const AddVaccineModal = ({ petId, onClose, onSuccess, vaccineToEdit }) => {
                             <label>Data Aplicação *</label>
                             <div className="input-with-icon">
                                 <FaCalendarAlt className="input-icon" />
-                                <input type="date" name="applicationDate" value={formData.applicationDate} onChange={handleChange} required />
+                                <input type="date" name="applicationDate" value={formData.applicationDate} onChange={handleChange} max={today} required />
                             </div>
                         </div>
                         <div className="form-group">

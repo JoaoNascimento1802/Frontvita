@@ -96,7 +96,6 @@ export const AuthProvider = ({ children }) => {
         } else {
             sessionStorage.setItem('authToken', newToken);
         }
-        console.log("Token de autenticação atualizado.");
     }
   };
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import api from '../../../services/api';
 import './css/styles.css';
 import './css/modal-styles.css';
@@ -13,6 +14,7 @@ const AddEmployeeModal = ({ onClose, onEmployeeAdded }) => {
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(defaultProfileIcon);
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -96,14 +98,34 @@ const AddEmployeeModal = ({ onClose, onEmployeeAdded }) => {
                     
                     <div className="form-group-modal">
                         <label>Senha Provisória</label>
-                        <input 
-                            type="password" 
-                            name="password" 
-                            placeholder="Mínimo 6 caracteres"
-                            minLength="6"
-                            required 
-                            onChange={handleChange} 
-                        />
+                        <div style={{ position: 'relative' }}>
+                            <input 
+                                type={showPassword ? "text" : "password"}
+                                name="password" 
+                                placeholder="Mínimo 6 caracteres"
+                                minLength="6"
+                                required 
+                                onChange={handleChange}
+                                style={{ paddingRight: '40px' }}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '10px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: '#666'
+                                }}
+                                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
                     </div>
                     
                     <div className="form-group-modal">

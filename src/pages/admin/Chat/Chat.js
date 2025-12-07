@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
-import { IoSend } from 'react-icons/io5';
+import { IoSend, IoArrowBack } from 'react-icons/io5';
 import { firestore } from '../../../services/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import '../Chat/css/Chat.css';
+import { toast } from 'react-toastify';
+import HeaderAdmin from '../../../components/HeaderAdmin/HeaderAdmin';
+import Footer from '../../../components/Footer';
+import '../../User/Chat/css/chat-styles.css';
+import '../../User/Chat/css/ConversationList.css';
 
 const AdminChat = () => {
     const { user, loading: authLoading } = useAuth();
@@ -23,52 +27,34 @@ const AdminChat = () => {
         const fetchConversations = async () => {
             setLoadingConversations(true);
             try {
-                let allConsultas = [];
-                let allServicos = [];
+                const [consultasRes, servicosRes] = await Promise.all([
+                    api.get('/admin/consultations'),
+                    api.get('/admin/service-schedules')
+                ]);
+                const allConsultas = consultasRes.data || [];
+                const allServicos = servicosRes.data || [];
 
-                if (user.role === 'ADMIN') {
-                    const [consultasRes, servicosRes] = await Promise.all([
-                        api.get('/admin/consultations'),
-                        api.get('/admin/service-schedules')
-                    ]);
-                    allConsultas = consultasRes.data || [];
-                    allServicos = servicosRes.data || [];
-                } 
-                else if (user.role === 'EMPLOYEE') {
-                    const servicosRes = await api.get('/api/employee/my-schedules');
-                    allServicos = servicosRes.data || [];
-                }
-
-                // Mapeia Consultas (Admin vê tudo)
                 const mappedConsultas = allConsultas
                     .filter(c => ['AGENDADA', 'FINALIZADA', 'CHECKED_IN', 'EM_ANDAMENTO'].includes(c.status))
                     .map(c => ({
                         id: c.id,
-                        chatRoomId: c.chatRoomId, // UUID
+                        chatRoomId: c.chatRoomId,
                         type: 'consultation',
-                        displayName: `${c.userName} (Tutor) - ${c.veterinaryName} (Vet)`,
-                        petName: `Pet: ${c.petName} - ${c.speciality}`,
+                        displayName: `${c.userName} ↔ ${c.veterinaryName}`,
+                        subTitle: `Pet: ${c.petName} - ${c.speciality}`,
                         avatarChar: c.userName?.charAt(0)
                     }));
 
-                // Mapeia Serviços (Admin vê tudo, Func vê seus clientes)
                 const mappedServicos = allServicos
                     .filter(s => ['AGENDADA', 'FINALIZADA'].includes(s.status))
-                    .map(s => {
-                        // MELHORIA DE UI: Se for funcionário, mostra só o nome do cliente
-                        const displayName = user.role === 'EMPLOYEE' 
-                            ? `${s.clientName} (Tutor)`
-                            : `${s.clientName} (Tutor) - ${s.employeeName} (Func)`;
-
-                        return {
-                            id: s.id,
-                            chatRoomId: s.chatRoomId, // UUID
-                            type: 'service',
-                            displayName: displayName,
-                            petName: `Pet: ${s.petName} - ${s.serviceName}`,
-                            avatarChar: s.clientName?.charAt(0)
-                        };
-                    });
+                    .map(s => ({
+                        id: s.id,
+                        chatRoomId: s.chatRoomId,
+                        type: 'service',
+                        displayName: `${s.clientName} ↔ ${s.employeeName}`,
+                        subTitle: `Pet: ${s.petName} - ${s.serviceName}`,
+                        avatarChar: s.clientName?.charAt(0)
+                    }));
                 
                 setConversations([...mappedConsultas, ...mappedServicos]);
 
@@ -86,11 +72,8 @@ const AdminChat = () => {
 
         setLoadingMessages(true);
         
-        // Lógica de UUID vs Legado
         const roomId = activeConversation.chatRoomId || activeConversation.id.toString();
         const collectionName = activeConversation.chatRoomId ? 'chats' : (activeConversation.type === 'service' ? 'services' : 'consultas');
-
-        console.log(`Conectando ao chat [${collectionName}]: ${roomId}`);
 
         const q = query(
             collection(firestore, `${collectionName}/${roomId}/mensagens`),
@@ -124,76 +107,115 @@ const AdminChat = () => {
         const originalMessage = newMessage;
         setNewMessage('');
 
-        // Define a URL baseada no tipo (consulta ou serviço)
+        // Se activeConversation.type não estiver definido, assume consultation
         const endpointType = activeConversation.type === 'service' ? 'service' : 'consultation';
         
         try {
-            // Envia JSON { content: ... }
+            // Envia JSON
             await api.post(`/chat/${endpointType}/${activeConversation.id}`, {
                 content: originalMessage
             });
         } catch (err) {
             console.error("Erro ao enviar mensagem:", err);
             setNewMessage(originalMessage);
-            alert("Não foi possível enviar a mensagem.");
+            toast.error("Não foi possível enviar a mensagem.");
         }
     };
 
+    // Se não há conversa ativa, mostra a lista de conversas (igual ConversationList do usuário)
+    if (!activeConversation) {
+        return (
+            <div className="conversation-page">
+                <HeaderAdmin />
+                <main className="list-container">
+                    <div className="list-header">
+                        <h1>Conversas Ativas</h1>
+                    </div>
+                    <div className="conversation-list">
+                        {loadingConversations ? (
+                            <p style={{ textAlign: 'center', padding: '20px' }}>Carregando...</p>
+                        ) : conversations.length === 0 ? (
+                            <p style={{ textAlign: 'center', padding: '20px' }}>Nenhuma conversa encontrada.</p>
+                        ) : (
+                            conversations.map(conv => (
+                                <div 
+                                    key={`${conv.type}-${conv.id}`} 
+                                    className="conversation-item"
+                                    onClick={() => handleConversationClick(conv)}
+                                >
+                                    <div className="avatar-placeholder">{conv.avatarChar}</div>
+                                    <div className="conversation-info">
+                                        <span className="conversation-name">{conv.displayName}</span>
+                                        <span className="conversation-subtitle">{conv.subTitle}</span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
+    // Se há conversa ativa, mostra o chat (igual Chat do usuário)
     return (
-        <div className="chat-container">
-            <div className="chat-sidebar">
-                <div className="sidebar-header"><h3>Conversas Ativas</h3></div>
-                <div className="contact-list">
-                    {loadingConversations ? (
-                        <p style={{ padding: '20px', textAlign: 'center' }}>Carregando...</p>
-                    ) : conversations.length === 0 ? (
-                        <p style={{ padding: '20px', textAlign: 'center', color: '#999' }}>Nenhuma conversa encontrada.</p>
-                    ) : (
-                        conversations.map(conv => (
+        <div className="user-chat-page">
+            <HeaderAdmin />
+            <div className="user-chat-container">
+                <div className="user-chat-sidebar">
+                    <div className="user-sidebar-header">
+                        <h3>Conversas</h3>
+                    </div>
+                    <div className="user-contact-list">
+                        {conversations.map(conv => (
                             <div 
                                 key={`${conv.type}-${conv.id}`} 
-                                className={`contact-item ${activeConversation?.id === conv.id && activeConversation?.type === conv.type ? 'active' : ''}`}
+                                className={`user-contact-item ${activeConversation?.id === conv.id && activeConversation?.type === conv.type ? 'active' : ''}`}
                                 onClick={() => handleConversationClick(conv)}
                             >
-                                <div className="card-avatar-placeholder">{conv.avatarChar}</div>
-                                <div className="contact-info">
-                                    <span className="contact-name">{conv.displayName}</span>
-                                    <span className="contact-last-message">{conv.petName}</span>
+                                <div className="avatar-placeholder" style={{ marginRight: '15px' }}>{conv.avatarChar}</div>
+                                <div className="conversation-info">
+                                    <span className="conversation-name">{conv.displayName}</span>
+                                    <span className="conversation-subtitle">{conv.subTitle}</span>
                                 </div>
                             </div>
-                        ))
-                    )}
+                        ))}
+                    </div>
+                </div>
+                
+                <div className="user-chat-main">
+                    <div className="user-chat-header">
+                        <button 
+                            className="back-to-list-btn"
+                            onClick={() => setActiveConversation(null)}
+                            aria-label="Voltar para lista de conversas"
+                        >
+                            <IoArrowBack size={24} />
+                        </button>
+                        <span>{activeConversation.displayName}</span>
+                    </div>
+                    <div className="user-message-area">
+                        {loadingMessages ? <p>Carregando mensagens...</p> : messages.map(msg => (
+                            <div key={msg.id} className={`user-message ${msg.senderId === user.id ? 'sent' : 'received'}`}>
+                                <strong>{msg.senderName}: </strong>
+                                {msg.content}
+                            </div>
+                        ))}
+                        <div ref={messagesEndRef} />
+                    </div>
+                    <form className="user-message-input-area" onSubmit={handleSendMessage}>
+                        <input 
+                            type="text" 
+                            placeholder="Digite sua mensagem..." 
+                            value={newMessage} 
+                            onChange={(e) => setNewMessage(e.target.value)} 
+                        />
+                        <button type="submit"><IoSend size={22} /></button>
+                    </form>
                 </div>
             </div>
-            
-            <div className="chat-main">
-                {activeConversation ? (
-                    <>
-                        <div className="chat-header">
-                            <span className="contact-name">{activeConversation.displayName}</span>
-                        </div>
-                        <div className="message-area">
-                            {loadingMessages ? <p>Carregando mensagens...</p> : messages.map(msg => (
-                                <div key={msg.id} className={`message ${msg.senderId === user.id ? 'sent' : 'received'}`}>
-                                    <strong>{msg.senderName}: </strong>{msg.content}
-                                </div>
-                            ))}
-                            <div ref={messagesEndRef} />
-                        </div>
-                        <form className="message-input-area" onSubmit={handleSendMessage}>
-                            <input 
-                                type="text" 
-                                placeholder="Digite sua mensagem..." 
-                                value={newMessage} 
-                                onChange={(e) => setNewMessage(e.target.value)} 
-                            />
-                            <button type="submit"><IoSend size={22} /></button>
-                        </form>
-                    </>
-                ) : (
-                    <div className="no-chat-selected">Selecione uma conversa para visualizar</div>
-                )}
-            </div>
+            <Footer />
         </div>
     );
 };

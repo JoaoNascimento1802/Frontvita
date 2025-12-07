@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import HeaderVet from '../../../components/HeaderVet/HeaderVet';
 import Footer from '../../../components/Footer';
+import ConfirmModal from '../../../components/ConfirmModal';
 import api from '../../../services/api';
 import { toast } from 'react-toastify';
 import './css/style.css';
@@ -31,6 +32,8 @@ const DetalhesConsulta = () => {
     const [vaccines, setVaccines] = useState([]);
     const [showVaccineModal, setShowVaccineModal] = useState(false);
     const [editingVaccine, setEditingVaccine] = useState(null);
+    const [confirmFinalize, setConfirmFinalize] = useState(false);
+    const [vaccineToDelete, setVaccineToDelete] = useState(null);
 
     const fetchVaccines = async (petId) => {
         try {
@@ -49,7 +52,8 @@ const DetalhesConsulta = () => {
             setConsulta(response.data);
             setReport(response.data.doctorReport || '');
             
-            if (response.data.serviceName === 'Vacinação') {
+            // Verifica se existe o nome e se ele INCLUI a palavra "Vacina"
+            if (response.data.serviceName && response.data.serviceName.includes('Vacina')) {
                 fetchVaccines(response.data.petId);
             }
 
@@ -89,14 +93,14 @@ const DetalhesConsulta = () => {
     };
     
     const handleFinalizeConsultation = async () => {
-        if (window.confirm('Tem certeza que deseja finalizar?')) {
-            try {
-                await api.post(`/consultas/${consultaId}/finalize`);
-                toast.success('Finalizada com sucesso!');
-                navigate('/vet/consultas');
-            } catch (err) {
-                toast.error('Erro ao finalizar.');
-            }
+        try {
+            await api.post(`/consultas/${consultaId}/finalize`);
+            toast.success('Consulta finalizada com sucesso!');
+            navigate('/vet/consultas');
+        } catch (err) {
+            toast.error('Erro ao finalizar consulta.');
+        } finally {
+            setConfirmFinalize(false);
         }
     };
 
@@ -151,15 +155,15 @@ const DetalhesConsulta = () => {
         }
     };
 
-    const handleDeleteVaccine = async (vaccineId) => {
-        if (window.confirm('Tem certeza que deseja remover esta vacina?')) {
-            try {
-                await api.delete(`/api/vaccines/${vaccineId}`);
-                toast.success("Vacina removida.");
-                fetchVaccines(consulta.petId);
-            } catch (error) {
-                toast.error('Erro ao deletar vacina.');
-            }
+    const handleDeleteVaccine = async () => {
+        try {
+            await api.delete(`/api/vaccines/${vaccineToDelete}`);
+            toast.success("Vacina removida com sucesso!");
+            fetchVaccines(consulta.petId);
+        } catch (error) {
+            toast.error('Erro ao deletar vacina.');
+        } finally {
+            setVaccineToDelete(null);
         }
     };
 
@@ -229,7 +233,7 @@ const DetalhesConsulta = () => {
                     </div>
 
                     {/* VACINAÇÃO */}
-                    {consulta.serviceName === 'Vacinação' && (
+                    {consulta.serviceName && consulta.serviceName.includes('Vacina') && (
                         <div className="section-block vaccination-block">
                             <div className="section-title-row">
                                 <h3><FaSyringe /> Carteira de Vacinação</h3>
@@ -246,7 +250,7 @@ const DetalhesConsulta = () => {
                                             key={vac.id} 
                                             vaccine={vac} 
                                             isVet={true} 
-                                            onDelete={handleDeleteVaccine}
+                                            onDelete={(vaccineId) => setVaccineToDelete(vaccineId)}
                                             onEdit={handleEditVaccine}
                                         />
                                     ))
@@ -356,7 +360,7 @@ const DetalhesConsulta = () => {
                         <Link to="/vet/consultas" className="back-button">Voltar</Link>
                         <Link to={`/vet/chat`} className="chat-button-link">Chat com Tutor</Link>
                         {consulta.status === 'AGENDADA' && (
-                            <button type="button" className="finalize-button" onClick={handleFinalizeConsultation}>Finalizar Atendimento</button>
+                            <button type="button" className="finalize-button" onClick={() => setConfirmFinalize(true)}>Finalizar Atendimento</button>
                         )}
                     </div>
 
@@ -371,6 +375,28 @@ const DetalhesConsulta = () => {
                     onSuccess={onVaccineSuccess} 
                 />
             )}
+
+            <ConfirmModal
+                isOpen={confirmFinalize}
+                title="Finalizar Atendimento"
+                message="Tem certeza que deseja finalizar esta consulta? Esta ação não pode ser desfeita."
+                onConfirm={handleFinalizeConsultation}
+                onCancel={() => setConfirmFinalize(false)}
+                confirmText="Sim, finalizar"
+                cancelText="Cancelar"
+                type="info"
+            />
+
+            <ConfirmModal
+                isOpen={vaccineToDelete !== null}
+                title="Remover Vacina"
+                message="Tem certeza que deseja remover esta vacina do histórico?"
+                onConfirm={handleDeleteVaccine}
+                onCancel={() => setVaccineToDelete(null)}
+                confirmText="Sim, remover"
+                cancelText="Cancelar"
+                type="danger"
+            />
 
             <Footer />
         </div>

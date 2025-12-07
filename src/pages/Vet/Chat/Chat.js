@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import HeaderVet from '../../../components/HeaderVet/HeaderVet';
-import Footer from '../../../components/Footer';
-import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
+import api from '../../../services/api';
 import { IoSend, IoArrowBack } from 'react-icons/io5';
 import { firestore } from '../../../services/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import '../../User/Chat/css/chat-styles.css'; 
+import HeaderVet from '../../../components/HeaderVet/HeaderVet';
+import Footer from '../../../components/Footer';
+import '../../User/Chat/css/chat-styles.css';
+import '../../User/Chat/css/ConversationList.css';
 
 const VetChat = () => {
     const { user, loading: authLoading } = useAuth();
@@ -19,58 +20,38 @@ const VetChat = () => {
     const [loadingConversations, setLoadingConversations] = useState(true);
     const [loadingMessages, setLoadingMessages] = useState(false);
 
-    const [allNotifications, setAllNotifications] = useState([]);
-    const [unreadConversations, setUnreadConversations] = useState(new Set());
-
-    // 1. Busca conversas
     useEffect(() => {
         if (authLoading || !user) return;
 
-        const fetchData = async () => {
+        const fetchConversations = async () => {
             setLoadingConversations(true);
             try {
-                // Busca consultas do veterinário
-                const [convResponse, notifResponse] = await Promise.all([
-                    api.get('/consultas/vet/my-consultations'),
-                    api.get('/notifications')
-                ]);
-
-                // Filtra apenas consultas ativas (Agendada/Finalizada/Em Andamento)
-                const activeConversations = convResponse.data.filter(c => 
-                    ['AGENDADA', 'FINALIZADA', 'EM_ANDAMENTO', 'CHECKED_IN'].includes(c.status)
-                );
+                const response = await api.get('/consultas/vet/my-consultations');
+                const activeConversations = (response.data || [])
+                    .filter(c => ['AGENDADA', 'FINALIZADA', 'EM_ANDAMENTO', 'CHECKED_IN'].includes(c.status))
+                    .map(c => ({
+                        id: c.id,
+                        chatRoomId: c.chatRoomId,
+                        type: 'consultation',
+                        displayName: `${c.userName} (Tutor)`,
+                        subTitle: `Pet: ${c.petName} - ${c.speciality}`,
+                        avatarChar: c.userName?.charAt(0)
+                    }));
                 setConversations(activeConversations);
-                
-                // Lógica de notificações não lidas
-                const unreadNotifs = notifResponse.data.filter(n => !n.read && n.consultationId);
-                setAllNotifications(unreadNotifs);
-                const unreadIds = new Set(unreadNotifs.map(n => n.consultationId));
-                setUnreadConversations(unreadIds);
-
             } catch (error) {
-                console.error("Erro ao buscar dados do chat:", error);
+                console.error("Erro ao buscar conversas:", error);
             } finally {
                 setLoadingConversations(false);
             }
         };
-        fetchData();
+        fetchConversations();
     }, [user, authLoading]);
 
-    // 2. Listener do Firebase
     useEffect(() => {
         if (!activeConversation) return;
         setLoadingMessages(true);
 
-        // DIAGNÓSTICO: Verifica se o chatRoomId está chegando
-        // Se aparecer "undefined" no console, significa que o DTO do Backend não está enviando este campo.
-        console.log("Conectando ao chat. ID:", activeConversation.id, "UUID (Room):", activeConversation.chatRoomId);
-
-        // LÓGICA CORRETA: Usa 'chatRoomId' se existir.
-        // Se for uma consulta muito antiga sem UUID, usa o ID normal (fallback), 
-        // mas o ideal é que todas tenham UUID agora.
         const roomId = activeConversation.chatRoomId || activeConversation.id.toString();
-
-        // Define a coleção base. Se tiver UUID, usa 'chats', senão usa a antiga 'consultas'
         const collectionName = activeConversation.chatRoomId ? 'chats' : 'consultas';
 
         const q = query(
@@ -95,18 +76,6 @@ const VetChat = () => {
 
     const handleConversationClick = (conv) => {
         setActiveConversation(conv);
-
-        // Limpa notificação visual se houver
-        if (unreadConversations.has(conv.id)) {
-            const notificationsToClear = allNotifications.filter(n => n.consultationId === conv.id);
-            notificationsToClear.forEach(n => api.post(`/notifications/${n.id}/read`));
-
-            setUnreadConversations(prev => {
-                const newSet = new Set(prev);
-                newSet.delete(conv.id);
-                return newSet;
-            });
-        }
     };
 
     const handleSendMessage = async (e) => {
@@ -114,82 +83,109 @@ const VetChat = () => {
         if (newMessage.trim() === '' || !activeConversation) return;
         
         const originalMessage = newMessage;
-        setNewMessage(''); // Limpa input imediatamente para melhor UX
+        setNewMessage('');
 
         try {
-            // CORREÇÃO: Removido o header manual
             await api.post(`/chat/consultation/${activeConversation.id}`, {
                 content: originalMessage
             });
         } catch (err) {
             console.error("Erro ao enviar mensagem:", err);
-            setNewMessage(originalMessage); // Devolve a mensagem se falhar
-            alert("Não foi possível enviar a mensagem.");
+            setNewMessage(originalMessage);
         }
     };
 
+    // Se não há conversa ativa, mostra a lista de conversas (igual ConversationList do usuário)
+    if (!activeConversation) {
+        return (
+            <div className="conversation-page">
+                <HeaderVet />
+                <main className="list-container">
+                    <div className="list-header">
+                        <h1>Minhas Conversas</h1>
+                    </div>
+                    <div className="conversation-list">
+                        {loadingConversations ? (
+                            <p style={{ textAlign: 'center', padding: '20px' }}>Carregando...</p>
+                        ) : conversations.length === 0 ? (
+                            <p style={{ textAlign: 'center', padding: '20px' }}>Nenhuma conversa encontrada.</p>
+                        ) : (
+                            conversations.map(conv => (
+                                <div 
+                                    key={conv.id} 
+                                    className="conversation-item"
+                                    onClick={() => handleConversationClick(conv)}
+                                >
+                                    <div className="avatar-placeholder">{conv.avatarChar}</div>
+                                    <div className="conversation-info">
+                                        <span className="conversation-name">{conv.displayName}</span>
+                                        <span className="conversation-subtitle">{conv.subTitle}</span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
+    // Se há conversa ativa, mostra o chat (igual Chat do usuário)
     return (
         <div className="user-chat-page">
             <HeaderVet />
-            <div className={`user-chat-container ${activeConversation ? 'chat-active' : ''}`}>
+            <div className="user-chat-container">
                 <div className="user-chat-sidebar">
-                    <div className="user-sidebar-header"><h3>Conversas</h3></div>
+                    <div className="user-sidebar-header">
+                        <h3>Conversas</h3>
+                    </div>
                     <div className="user-contact-list">
-                        {loadingConversations ? <p style={{padding: '20px'}}>Carregando...</p> : conversations.map(conv => (
+                        {conversations.map(conv => (
                             <div 
                                 key={conv.id} 
                                 className={`user-contact-item ${activeConversation?.id === conv.id ? 'active' : ''}`}
                                 onClick={() => handleConversationClick(conv)}
                             >
-                                <div className="contact-info">
-                                    <span style={{ fontWeight: 600, color: '#333' }}>{conv.userName}</span>
-                                    <span style={{ fontSize: '0.9rem', color: '#888' }}>Pet: {conv.petName}</span>
+                                <div className="avatar-placeholder" style={{ marginRight: '15px' }}>{conv.avatarChar}</div>
+                                <div className="conversation-info">
+                                    <span className="conversation-name">{conv.displayName}</span>
+                                    <span className="conversation-subtitle">{conv.subTitle}</span>
                                 </div>
-                                {unreadConversations.has(conv.id) && <span className="unread-badge">!</span>}
                             </div>
                         ))}
-                        {conversations.length === 0 && !loadingConversations && (
-                            <p style={{padding: '20px', color: '#777'}}>Nenhuma consulta ativa no momento.</p>
-                        )}
                     </div>
                 </div>
                 
                 <div className="user-chat-main">
-                    {activeConversation ? (
-                        <>
-                            <div className="user-chat-header">
-                                <button 
-                                    className="back-to-list-btn"
-                                    onClick={() => setActiveConversation(null)}
-                                    aria-label="Voltar para lista de conversas"
-                                >
-                                    <IoArrowBack size={24} />
-                                </button>
-                                <span style={{ fontWeight: 600, color: 'white' }}>{activeConversation.userName} (Tutor de {activeConversation.petName})</span>
+                    <div className="user-chat-header">
+                        <button 
+                            className="back-to-list-btn"
+                            onClick={() => setActiveConversation(null)}
+                            aria-label="Voltar para lista de conversas"
+                        >
+                            <IoArrowBack size={24} />
+                        </button>
+                        <span>{activeConversation.displayName}</span>
+                    </div>
+                    <div className="user-message-area">
+                        {loadingMessages ? <p>Carregando mensagens...</p> : messages.map(msg => (
+                            <div key={msg.id} className={`user-message ${msg.senderId === user.id ? 'sent' : 'received'}`}>
+                                <strong>{msg.senderName}: </strong>
+                                {msg.content}
                             </div>
-                            <div className="user-message-area">
-                                {loadingMessages ? <p>Carregando mensagens...</p> : messages.map(msg => (
-                                    <div key={msg.id} className={`user-message ${msg.senderId === user.id ? 'sent' : 'received'}`}>
-                                        {msg.content}
-                                    </div>
-                                ))}
-                                <div ref={messagesEndRef} />
-                            </div>
-                            <form className="user-message-input-area" onSubmit={handleSendMessage}>
-                                <input 
-                                    type="text" 
-                                    placeholder='Digite sua mensagem...'
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                />
-                                <button type="submit"><IoSend size={22} /></button>
-                            </form>
-                        </>
-                    ) : (
-                        <div className="user-message-area" style={{ alignItems: 'center', justifyContent: 'center' }}>
-                            <p style={{ color: '#888', fontSize: '1.2rem' }}>Selecione uma conversa para começar</p>
-                        </div>
-                    )}
+                        ))}
+                        <div ref={messagesEndRef} />
+                    </div>
+                    <form className="user-message-input-area" onSubmit={handleSendMessage}>
+                        <input 
+                            type="text" 
+                            placeholder="Digite sua mensagem..." 
+                            value={newMessage} 
+                            onChange={(e) => setNewMessage(e.target.value)} 
+                        />
+                        <button type="submit"><IoSend size={22} /></button>
+                    </form>
                 </div>
             </div>
             <Footer />

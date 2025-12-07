@@ -7,6 +7,7 @@ import Footer from '../../../components/Footer';
 import ImageCropper from '../../../components/ImageCropper/ImageCropper';
 import profileIcon from '../../../assets/images/Perfil/perfilIcon.png';
 import { FaPencilAlt } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import './css/Perfil.css';
 
 const AdminPerfil = () => {
@@ -81,7 +82,7 @@ const AdminPerfil = () => {
             // 3. ATUALIZA O CONTEXTO (usuário e token)
             updateTokenAndUser(response.data);
 
-            alert('Perfil atualizado com sucesso!');
+            toast.success('Perfil atualizado com sucesso!');
             setIsEditing(false);
             setHasChanges(false);
             setImageFile(null);
@@ -94,7 +95,7 @@ const AdminPerfil = () => {
             fetchAdminData(); // Recarrega os dados
 
         } catch (err) {
-            alert('Erro ao salvar as alterações.');
+            toast.error('Erro ao salvar as alterações.');
             console.error(err.response || err);
         } finally {
             setIsSaving(false);

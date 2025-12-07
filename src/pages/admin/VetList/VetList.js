@@ -4,7 +4,9 @@ import HeaderAdmin from '../../../components/HeaderAdmin/HeaderAdmin';
 import Footer from '../../../components/Footer';
 import AddVetModal from './AddVetModal';
 import EditVetModal from './EditVetModal';
+import ConfirmModal from '../../../components/ConfirmModal';
 import api from '../../../services/api';
+import { toast } from 'react-toastify';
 import './css/VetList.css'; 
 
 const specialityLabels = [
@@ -21,6 +23,7 @@ const VetList = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedVet, setSelectedVet] = useState(null);
+    const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, vetId: null });
 
     // Estados dos filtros
     const [nameFilter, setNameFilter] = useState('');
@@ -58,14 +61,19 @@ const VetList = () => {
         setIsEditModalOpen(true);
     };
 
-    const handleDelete = async (vetId) => {
-        if (window.confirm('Tem certeza que deseja excluir este veterinário? Esta ação é irreversível.')) {
-            try {
-                await api.delete(`/admin/veterinarians/${vetId}`);
-                fetchVets(); 
-            } catch (error) {
-                alert('Erro ao excluir veterinário.');
-            }
+    const handleDelete = (vetId) => {
+        setConfirmDelete({ isOpen: true, vetId });
+    };
+
+    const confirmDeleteVet = async () => {
+        try {
+            await api.delete(`/admin/veterinarians/${confirmDelete.vetId}`);
+            toast.success('Veterinário excluído com sucesso!');
+            fetchVets();
+        } catch (error) {
+            toast.error('Erro ao excluir veterinário.');
+        } finally {
+            setConfirmDelete({ isOpen: false, vetId: null });
         }
     };
 
@@ -154,6 +162,17 @@ const VetList = () => {
                     onVetUpdated={onVetUpdated}
                 />
             )}
+
+            <ConfirmModal
+                isOpen={confirmDelete.isOpen}
+                title="Excluir Veterinário"
+                message="Tem certeza que deseja excluir este veterinário? Esta ação é irreversível."
+                onConfirm={confirmDeleteVet}
+                onCancel={() => setConfirmDelete({ isOpen: false, vetId: null })}
+                confirmText="Excluir"
+                cancelText="Cancelar"
+                type="danger"
+            />
             
             <Footer />
         </div>

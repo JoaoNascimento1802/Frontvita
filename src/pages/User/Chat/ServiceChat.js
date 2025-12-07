@@ -7,6 +7,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { IoSend, IoArrowBack } from 'react-icons/io5';
 import { firestore } from '../../../services/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 import './css/chat-styles.css'; // Garanta que seu CSS com as classes .user-* está aqui
 
 const ServiceChat = () => {
@@ -56,8 +57,6 @@ const ServiceChat = () => {
 
         const roomId = chatRoomId || serviceScheduleId;
         const collectionName = chatRoomId ? 'chats' : 'services';
-        
-        console.log(`User Service Chat: Conectando em ${collectionName}/${roomId}`);
 
         const q = query(
             collection(firestore, `${collectionName}/${roomId}/mensagens`),
@@ -97,7 +96,7 @@ const ServiceChat = () => {
         } catch (err) {
             console.error("Erro ao enviar mensagem:", err);
             setNewMessage(originalMessage);
-            alert("Não foi possível enviar a mensagem.");
+            toast.error("Não foi possível enviar a mensagem.");
         }
     };
 

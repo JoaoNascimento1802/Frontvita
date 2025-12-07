@@ -1,6 +1,8 @@
 // src/pages/admin/VetList/AddVetModal.js
 import React, { useState } from 'react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import api from '../../../services/api';
+import { toast } from 'react-toastify';
 import './css/VetList.css';
 import profileIcon from '../../../assets/images/Header/perfilIcon.png';
 
@@ -20,6 +22,7 @@ const AddVetModal = ({ onClose, onVetAdded }) => {
     const [imagePreview, setImagePreview] = useState(profileIcon);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -47,9 +50,8 @@ const AddVetModal = ({ onClose, onVetAdded }) => {
                 phone: formData.phone,
                 address: "Endereço Padrão (Admin)",
                 rg: formData.rg,
-                // --- IMPORTANTE: Enviando o CRMV para a API ---
-                crmv: formData.crmv, 
-                // ----------------------------------------------
+                crmv: formData.crmv,
+                speciality: formData.specialityenum, // <--- MUDANÇA AQUI
                 imageurl: '', 
                 role: 'VETERINARY'
             });
@@ -69,7 +71,7 @@ const AddVetModal = ({ onClose, onVetAdded }) => {
                 await api.post(`/upload/user/${newUser.id}`, uploadFormData);
             }
             
-            alert('Veterinário cadastrado com sucesso!');
+            toast.success('Veterinário cadastrado com sucesso!');
             onVetAdded();
         } catch (err) {
             const errorMsg = err.response?.data?.message || "Erro ao cadastrar veterinário.";
@@ -94,7 +96,35 @@ const AddVetModal = ({ onClose, onVetAdded }) => {
                     </div>
                     <div className="form-group-modal"><label>Nome Completo</label><input type="text" name="name" required onChange={handleChange} /></div>
                      <div className="form-group-modal"><label>Email</label><input type="email" name="email" required onChange={handleChange} /></div>
-                    <div className="form-group-modal"><label>Senha Provisória</label><input type="password" name="password" required onChange={handleChange} /></div>
+                    <div className="form-group-modal">
+                        <label>Senha Provisória</label>
+                        <div style={{ position: 'relative' }}>
+                            <input 
+                                type={showPassword ? "text" : "password"}
+                                name="password" 
+                                required 
+                                onChange={handleChange}
+                                style={{ paddingRight: '40px' }}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '10px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: '#666'
+                                }}
+                                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
+                    </div>
                     
                     {/* Campo CRMV */}
                     <div className="form-group-modal"><label>CRMV</label><input type="text" name="crmv" required onChange={handleChange} placeholder="Ex: SP-12345" /></div>

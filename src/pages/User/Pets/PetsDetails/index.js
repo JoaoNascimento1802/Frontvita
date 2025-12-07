@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../context/AuthContext';
 import api from '../../../../services/api';
+import { toast } from 'react-toastify';
 import HeaderComCadastro from '../../../../components/HeaderComCadastro';
 import Footer from '../../../../components/Footer';
 import ImageCropper from '../../../../components/ImageCropper/ImageCropper';
+import ConfirmModal from '../../../../components/ConfirmModal';
 import { FaPencilAlt, FaPlus, FaNotesMedical, FaFileMedical } from 'react-icons/fa';
 import profileIcon from '../../../../assets/images/Header/perfilIcon.png';
 import './css/styles.css';
@@ -66,6 +68,8 @@ const PetsDetails = () => {
     const [vaccines, setVaccines] = useState([]);
     const [showVaccineModal, setShowVaccineModal] = useState(false);
     const [medicalRecords, setMedicalRecords] = useState([]);
+    const [showDeletePetModal, setShowDeletePetModal] = useState(false);
+    const [vaccineToDelete, setVaccineToDelete] = useState(null);
 
     const isVet = user?.role === 'VETERINARY';
 
@@ -192,26 +196,25 @@ const PetsDetails = () => {
             setIsEditing(false);
             setHasChanges(false);
             setImageFile(null);
-            alert('Dados do pet atualizados com sucesso!');
+            toast.success('Dados do pet atualizados com sucesso!');
 
         } catch (err) {
             console.error(err);
-            alert('Erro ao salvar as alterações.');
+            toast.error('Erro ao salvar as alterações.');
         } finally {
             setIsSaving(false);
         }
     };
 
-    const handleDelete = async (event) => {
-        event.preventDefault();
-        if (window.confirm(`Tem certeza que deseja remover ${petData.name}?`)) {
-            try {
-                await api.delete(`/pets/${petId}`);
-                alert('Pet removido com sucesso!');
-                navigate('/pets');
-            } catch (err) {
-                alert('Erro ao remover o pet.');
-            }
+    const handleDelete = async () => {
+        try {
+            await api.delete(`/pets/${petId}`);
+            toast.success('Pet removido com sucesso!');
+            navigate('/pets');
+        } catch (err) {
+            toast.error('Erro ao remover o pet.');
+        } finally {
+            setShowDeletePetModal(false);
         }
     };
 
@@ -230,14 +233,15 @@ const PetsDetails = () => {
         setImageToCrop(null);
     };
 
-    const handleDeleteVaccine = async (vaccineId) => {
-        if (window.confirm('Tem certeza que deseja remover esta vacina?')) {
-            try {
-                await api.delete(`/api/vaccines/${vaccineId}`);
-                fetchVaccines();
-            } catch (error) {
-                alert('Erro ao deletar vacina.');
-            }
+    const handleDeleteVaccine = async () => {
+        try {
+            await api.delete(`/api/vaccines/${vaccineToDelete}`);
+            toast.success('Vacina removida com sucesso!');
+            fetchVaccines();
+        } catch (error) {
+            toast.error('Erro ao deletar vacina.');
+        } finally {
+            setVaccineToDelete(null);
         }
     };
 
@@ -365,7 +369,7 @@ const PetsDetails = () => {
                                         ) : (
                                             <>
                                                 <button type="button" className="edit-button" onClick={handleEditClick}>Editar</button>
-                                                <button type="button" className="decline-button" onClick={handleDelete}>Remover Pet</button>
+                                                <button type="button" className="decline-button" onClick={(e) => { e.preventDefault(); setShowDeletePetModal(true); }}>Remover Pet</button>
                                                 <Link to="/pets" className="back-button">Voltar</Link>
                                             </>
                                         )}
@@ -411,7 +415,7 @@ const PetsDetails = () => {
                                             key={vac.id} 
                                             vaccine={vac} 
                                             isVet={isVet} 
-                                            onDelete={handleDeleteVaccine} 
+                                            onDelete={(vaccineId) => setVaccineToDelete(vaccineId)} 
                                         />
                                     ))
                                 )}
@@ -497,6 +501,28 @@ const PetsDetails = () => {
                     onSuccess={fetchVaccines} 
                 />
             )}
+
+            <ConfirmModal
+                isOpen={showDeletePetModal}
+                title="Remover Pet"
+                message={`Tem certeza que deseja remover ${petData?.name}? Esta ação é irreversível.`}
+                onConfirm={handleDelete}
+                onCancel={() => setShowDeletePetModal(false)}
+                confirmText="Sim, remover"
+                cancelText="Cancelar"
+                type="danger"
+            />
+
+            <ConfirmModal
+                isOpen={vaccineToDelete !== null}
+                title="Remover Vacina"
+                message="Tem certeza que deseja remover esta vacina do histórico?"
+                onConfirm={handleDeleteVaccine}
+                onCancel={() => setVaccineToDelete(null)}
+                confirmText="Sim, remover"
+                cancelText="Cancelar"
+                type="danger"
+            />
             
             <Footer />
         </div>

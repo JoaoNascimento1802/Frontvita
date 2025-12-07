@@ -3,124 +3,229 @@ import HeaderAdmin from '../../../components/HeaderAdmin/HeaderAdmin';
 import Footer from '../../../components/Footer';
 import api from '../../../services/api';
 import { toast } from 'react-toastify';
+import { FaCalendarAlt, FaChevronLeft, FaChevronRight, FaSave, FaTrash, FaCog, FaTimes, FaClock } from 'react-icons/fa';
 import './WorkSchedules.css';
 
-// --- CORREÇÃO DO LOOP INFINITO ---
-// Definindo a constante FORA do componente, ela não será recriada a cada renderização.
-
-// Ordem correta dos dias da semana (em inglês, como vem do backend)
-const dayOrder = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
-
-// Mapeamento de dias da semana do inglês para português
 const dayTranslation = {
-    "MONDAY": "Segunda-feira",
-    "TUESDAY": "Terça-feira",
+    "MONDAY": "Segunda-feira", 
+    "TUESDAY": "Terça-feira", 
     "WEDNESDAY": "Quarta-feira",
-    "THURSDAY": "Quinta-feira",
-    "FRIDAY": "Sexta-feira",
-    "SATURDAY": "Sábado",
-    "SUNDAY": "Domingo",
-    "SEGUNDA": "Segunda-feira",
-    "TERÇA": "Terça-feira",
-    "QUARTA": "Quarta-feira",
-    "QUINTA": "Quinta-feira",
-    "SEXTA": "Sexta-feira",
-    "SÁBADO": "Sábado",
-    "DOMINGO": "Domingo"
+    "THURSDAY": "Quinta-feira", 
+    "FRIDAY": "Sexta-feira", 
+    "SATURDAY": "Sábado", 
+    "SUNDAY": "Domingo"
 };
 
+const dayOrder = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+
 const WorkSchedules = () => {
-    const [vets, setVets] = useState([]);
-    const [employees, setEmployees] = useState([]);
-    const [selectedProfessional, setSelectedProfessional] = useState(''); // Formato: "type-id"
-    const [schedules, setSchedules] = useState([]);
+    const [professionals, setProfessionals] = useState([]);
+    const [selectedProfessional, setSelectedProfessional] = useState(''); 
     const [loading, setLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [currentDate, setCurrentDate] = useState(new Date()); 
+
+    const [templateSchedules, setTemplateSchedules] = useState([]);
+    const [monthlySchedules, setMonthlySchedules] = useState([]); 
+
+    const [isDayModalOpen, setIsDayModalOpen] = useState(false);
+    const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+    const [selectedDateData, setSelectedDateData] = useState(null);
+
+    // Gera estrutura vazia se o usuário não tiver horário
+    const generateDefaultWeek = () => {
+        return dayOrder.map((day, index) => ({
+            id: `temp-${index}`, // ID temporário
+            dayOfWeek: day,
+            startTime: '09:00',
+            endTime: '18:00',
+            isWorking: index < 5 // Seg a Sex true, Sáb/Dom false
+        }));
+    };
 
     useEffect(() => {
-        const fetchProfessionals = async () => {
+        const loadPros = async () => {
             try {
-                // --- CORREÇÃO DA LISTA DE PROFISSIONAIS ---
-                // Busca dos endpoints corretos e separados
-                const [vetsRes, employeesRes] = await Promise.all([
-                    api.get('/admin/veterinarians'), // Busca apenas veterinários
-                    api.get('/api/employee/all')      // Busca apenas funcionários
+                const [vets, emps] = await Promise.all([
+                    api.get('/admin/veterinarians'),
+                    api.get('/api/employee/all')
                 ]);
-
-                // Ajuste para pegar o ID do veterinário
-                const mappedVets = vetsRes.data.map(v => ({
-                    id: v.id, 
-                    name: v.name
-                }));
-
-                setVets(mappedVets || []);
-                setEmployees(employeesRes.data || []);
-
-            } catch (error) {
-                toast.error("Erro ao carregar lista de profissionais.");
-                console.error("Erro ao buscar profissionais:", error);
+                const allPros = [
+                    ...vets.data.map(v => ({ id: v.id, name: v.name, type: 'VET' })),
+                    ...emps.data.map(e => ({ id: e.id, name: e.username, type: 'EMP' }))
+                ];
+                setProfessionals(allPros);
+            } catch (error) { 
+                console.error(error);
+                toast.error("Erro ao carregar profissionais.");
             }
         };
-        fetchProfessionals();
-    }, []); // Roda apenas uma vez
+        loadPros();
+    }, []);
 
-    // --- CORREÇÃO DO LOOP INFINITO ---
-    // A dependência 'dayOfWeekNames' foi removida
-    const fetchSchedules = useCallback(async () => {
-        if (!selectedProfessional) {
-            setSchedules([]);
-            return;
-        }
-        
+    const fetchData = useCallback(async () => {
+        if (!selectedProfessional) return;
         const [type, id] = selectedProfessional.split('-');
-        if (!type || !id) return;
-
         setLoading(true);
         try {
-            // --- CORREÇÃO DA URL DA API ---
-            // A URL agora corresponde ao novo controller: /admin/schedules/...
-            const response = await api.get(`/admin/schedules/${type}/${id}`);
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1;
+
+            const [templateRes, monthlyRes] = await Promise.all([
+                api.get(`/admin/schedules/template/${id}`),
+                api.get(`/admin/schedules/monthly/${id}?year=${year}&month=${month}`)
+            ]);
+
+            // --- CORREÇÃO AQUI ---
+            let loadedTemplate = templateRes.data || [];
             
-            // Ordena os horários pela ordem correta dos dias da semana
-            const sortedSchedules = response.data.sort((a, b) => 
-                dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek)
-            );
-            setSchedules(sortedSchedules);
+            // Se veio vazio do banco, gera o padrão localmente para exibir na tela
+            if (loadedTemplate.length === 0) {
+                loadedTemplate = generateDefaultWeek();
+            } else {
+                // Ordena se veio do banco
+                loadedTemplate.sort((a, b) => dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek));
+            }
+
+            setTemplateSchedules(loadedTemplate);
+            setMonthlySchedules(monthlyRes.data || []);
         } catch (error) {
-            toast.error("Erro ao carregar horários do profissional.");
             console.error(error);
-            setSchedules([]);
+            toast.error("Erro ao carregar horários.");
         } finally {
             setLoading(false);
         }
-    }, [selectedProfessional]); // Agora só depende de 'selectedProfessional'
+    }, [selectedProfessional, currentDate]);
 
-    useEffect(() => {
-        fetchSchedules();
-    }, [fetchSchedules]); // Este hook agora é seguro
-    
-    const handleScheduleChange = (id, field, value) => {
-        setSchedules(currentSchedules =>
-            currentSchedules.map(schedule =>
-                schedule.id === id ? { ...schedule, [field]: value } : schedule
-            )
-        );
+    useEffect(() => { 
+        fetchData(); 
+    }, [fetchData]);
+
+    const handlePrevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    const handleNextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+
+    const getDayData = (day) => {
+        const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        
+        const specific = monthlySchedules.find(s => s.workDate === dateStr);
+        if (specific) return { ...specific, type: 'specific' };
+
+        const dateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        const jsDayIndex = dateObj.getDay(); 
+        const javaDayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+        const dayName = javaDayNames[jsDayIndex];
+
+        const template = templateSchedules.find(t => t.dayOfWeek === dayName);
+        if (template) {
+            return { ...template, workDate: dateStr, type: 'template' };
+        } else {
+            // Fallback se template estiver vazio (raro com a correção acima)
+            return { 
+                workDate: dateStr, 
+                startTime: '09:00', 
+                endTime: '18:00', 
+                isWorking: false, 
+                type: 'template', 
+                dayOfWeek: dayName 
+            };
+        }
     };
 
-    const handleSave = async () => {
-        if (!selectedProfessional) return;
-        const [type, id] = selectedProfessional.split('-');
+    const handleDayClick = (day) => {
+        const data = getDayData(day);
+        setSelectedDateData({
+            ...data,
+            startTime: data.startTime || '09:00',
+            endTime: data.endTime || '18:00',
+            isWorking: data.isWorking,
+            id: data.type === 'specific' ? data.id : null 
+        });
+        setIsDayModalOpen(true);
+    };
 
+    const saveSpecific = async () => {
+        const [type, userId] = selectedProfessional.split('-');
         setIsSaving(true);
         try {
-            // --- CORREÇÃO DA URL DA API ---
-            await api.put(`/admin/schedules/${type}/${id}`, schedules);
-            toast.success("Horários atualizados com sucesso!");
+            await api.post(`/admin/schedules/specific/${userId}`, selectedDateData);
+            toast.success("Dia salvo!");
+            setIsDayModalOpen(false);
+            fetchData();
+        } catch(e) { 
+            toast.error("Erro ao salvar."); 
+        } finally { 
+            setIsSaving(false); 
+        }
+    };
+
+    const deleteSpecific = async () => {
+        if (!selectedDateData.id) return;
+        setIsSaving(true);
+        try {
+            await api.delete(`/admin/schedules/specific/${selectedDateData.id}`);
+            toast.success("Restaurado.");
+            setIsDayModalOpen(false);
+            fetchData();
+        } catch(e) { 
+            toast.error("Erro."); 
+        } finally { 
+            setIsSaving(false); 
+        }
+    };
+
+    const handleTemplateChange = (id, field, value) => {
+        setTemplateSchedules(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
+    };
+
+    const saveTemplate = async () => {
+        const [type, id] = selectedProfessional.split('-');
+        setIsSaving(true);
+        try {
+            // Ao salvar, o backend vai criar os registros reais
+            await api.put(`/admin/schedules/template/${id}`, templateSchedules);
+            toast.success("Padrão salvo com sucesso!");
+            setIsTemplateModalOpen(false);
+            fetchData();
         } catch (error) {
-            toast.error("Falha ao salvar horários.");
+            toast.error("Falha ao salvar padrão.");
         } finally {
             setIsSaving(false);
         }
+    };
+
+    const renderCalendarGrid = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const slots = [];
+
+        for(let i=0; i<firstDay; i++) slots.push(<div key={`empty-${i}`} className="cal-cell empty"></div>);
+
+        for(let d=1; d<=daysInMonth; d++) {
+            const data = getDayData(d);
+            let classes = "cal-cell";
+            if (data.isWorking) {
+                if (data.type === 'specific') classes += " specific";
+                else classes += " working";
+            } else { 
+                classes += " off"; 
+            }
+
+            slots.push(
+                <div key={d} className={classes} onClick={() => handleDayClick(d)}>
+                    <span className="day-num">{d}</span>
+                    <div className="day-content">
+                        {data.isWorking ? 
+                            <small>{data.startTime?.slice(0,5)} - {data.endTime?.slice(0,5)}</small> : 
+                            <small className="label-off">FOLGA</small>
+                        }
+                        {data.type === 'specific' && <span className="dot-indicator">●</span>}
+                    </div>
+                </div>
+            );
+        }
+        return slots;
     };
 
     return (
@@ -128,76 +233,182 @@ const WorkSchedules = () => {
             <HeaderAdmin />
             <main className="admin-content">
                 <div className="admin-page-header">
-                    <h1>Gerenciar Horários de Trabalho</h1>
+                    <h1>Gerenciar Escalas</h1>
                 </div>
+
                 <div className="admin-filters">
-                    <select value={selectedProfessional} onChange={(e) => setSelectedProfessional(e.target.value)}>
+                    <select value={selectedProfessional} onChange={e => setSelectedProfessional(e.target.value)}>
                         <option value="">Selecione um Profissional</option>
                         <optgroup label="Veterinários">
-                            {vets.map(v => (
-                                <option key={`veterinary-${v.id}`} value={`veterinary-${v.id}`}>{v.name}</option>
-                            ))}
+                            {professionals.filter(p => p.type === 'VET').map(p => 
+                                <option key={p.id} value={`vet-${p.id}`}>{p.name}</option>
+                            )}
                         </optgroup>
                         <optgroup label="Funcionários">
-                            {employees.map(e => (
-                                <option key={`employee-${e.id}`} value={`employee-${e.id}`}>{e.username}</option>
-                            ))}
+                            {professionals.filter(p => p.type === 'EMP').map(p => 
+                                <option key={p.id} value={`emp-${p.id}`}>{p.name}</option>
+                            )}
                         </optgroup>
                     </select>
+                    {selectedProfessional && (
+                        <button className="btn-config-template" onClick={() => setIsTemplateModalOpen(true)}>
+                            <FaCog /> Configurar Padrão Semanal
+                        </button>
+                    )}
                 </div>
-                
-                {loading && <p>Carregando horários...</p>}
 
-                {!loading && selectedProfessional && schedules.length > 0 && (
-                    <div className="schedule-container">
-                        <table className="schedule-table">
-                            <thead>
-                                <tr>
-                                    <th>Dia da Semana</th>
-                                    <th>Trabalha?</th>
-                                    <th>Início</th>
-                                    <th>Fim</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {schedules.map(schedule => (
-                                    <tr key={schedule.id}>
-                                        <td>{dayTranslation[schedule.dayOfWeek] || schedule.dayOfWeek.replace(/_/g, ' ')}</td>
-                                        <td>
-                                            <input
-                                                type="checkbox"
-                                                checked={schedule.isWorking}
-                                                onChange={(e) => handleScheduleChange(schedule.id, 'isWorking', e.target.checked)}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="time"
-                                                value={schedule.startTime}
-                                                disabled={!schedule.isWorking}
-                                                onChange={(e) => handleScheduleChange(schedule.id, 'startTime', e.target.value)}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="time"
-                                                value={schedule.endTime}
-                                                disabled={!schedule.isWorking}
-                                                onChange={(e) => handleScheduleChange(schedule.id, 'endTime', e.target.value)}
-                                            />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <div className="schedule-actions">
-                            <button className="btn-save" onClick={handleSave} disabled={isSaving}>
-                                {isSaving ? 'Salvando...' : 'Salvar Alterações'}
-                            </button>
+                {selectedProfessional && (
+                    <div className="schedule-box">
+                        <div className="calendar-view">
+                            <div className="cal-nav">
+                                <button onClick={handlePrevMonth}><FaChevronLeft/></button>
+                                <h3>{currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase()}</h3>
+                                <button onClick={handleNextMonth}><FaChevronRight/></button>
+                            </div>
+                            <div className="cal-grid-header">
+                                <div>DOM</div>
+                                <div>SEG</div>
+                                <div>TER</div>
+                                <div>QUA</div>
+                                <div>QUI</div>
+                                <div>SEX</div>
+                                <div>SÁB</div>
+                            </div>
+                            <div className="cal-grid">
+                                {loading ? <p className="loading-cal">Carregando...</p> : renderCalendarGrid()}
+                            </div>
+                            <div className="calendar-legend">
+                                <div><span className="dot working"></span> Padrão</div>
+                                <div><span className="dot specific"></span> Exceção</div>
+                                <div><span className="dot off"></span> Folga</div>
+                            </div>
                         </div>
                     </div>
                 )}
             </main>
+
+            {/* MODAL PADRÃO SEMANAL CORRIGIDO */}
+            {isTemplateModalOpen && (
+                <div className="modal-overlay" onClick={() => setIsTemplateModalOpen(false)}>
+                    <div className="modal-content-schedule template-modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header-custom">
+                            <h3><FaClock /> Configurar Padrão Semanal</h3>
+                            {/* BOTÃO X CORRIGIDO */}
+                            <button className="btn-close-modal" onClick={() => setIsTemplateModalOpen(false)}>
+                                <FaTimes />
+                            </button>
+                        </div>
+                        <div className="table-container">
+                            <table className="schedule-table">
+                                <thead>
+                                    <tr>
+                                        <th>Dia</th>
+                                        <th>Status</th>
+                                        <th>Início</th>
+                                        <th>Fim</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {templateSchedules.map((s, index) => (
+                                        <tr key={s.id || index} className={!s.isWorking ? 'disabled-row' : ''}>
+                                            <td><strong>{dayTranslation[s.dayOfWeek]}</strong></td>
+                                            <td>
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={s.isWorking} 
+                                                    onChange={e => handleTemplateChange(s.id, 'isWorking', e.target.checked)}
+                                                />
+                                                <span style={{marginLeft: '8px'}}>
+                                                    {s.isWorking ? 'Trabalha' : 'Folga'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <input 
+                                                    type="time" 
+                                                    value={s.startTime} 
+                                                    disabled={!s.isWorking} 
+                                                    onChange={e => handleTemplateChange(s.id, 'startTime', e.target.value)} 
+                                                    className="time-input"
+                                                />
+                                            </td>
+                                            <td>
+                                                <input 
+                                                    type="time" 
+                                                    value={s.endTime} 
+                                                    disabled={!s.isWorking} 
+                                                    onChange={e => handleTemplateChange(s.id, 'endTime', e.target.value)} 
+                                                    className="time-input"
+                                                />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="modal-actions">
+                            <button className="btn-save" onClick={saveTemplate} disabled={isSaving}>
+                                {isSaving ? 'Salvando...' : 'Salvar Padrão'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL DIA ESPECÍFICO */}
+            {isDayModalOpen && selectedDateData && (
+                <div className="modal-overlay" onClick={() => setIsDayModalOpen(false)}>
+                    <div className="modal-content-schedule day-modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header-custom">
+                            <h3>Editar: {new Date(selectedDateData.workDate).toLocaleDateString('pt-BR')}</h3>
+                            <button className="btn-close-modal" onClick={() => setIsDayModalOpen(false)}>
+                                <FaTimes />
+                            </button>
+                        </div>
+                        <div className="form-group-modal">
+                            <label>Status:</label>
+                            <select 
+                                value={selectedDateData.isWorking} 
+                                onChange={e => setSelectedDateData({...selectedDateData, isWorking: e.target.value === 'true'})} 
+                                className="full-width-select"
+                            >
+                                <option value="true">Trabalha</option>
+                                <option value="false">Folga</option>
+                            </select>
+                        </div>
+                        {selectedDateData.isWorking && (
+                            <div className="form-row-modal">
+                                <div className="form-group-modal">
+                                    <label>Início</label>
+                                    <input 
+                                        type="time" 
+                                        value={selectedDateData.startTime} 
+                                        onChange={e => setSelectedDateData({...selectedDateData, startTime: e.target.value})}
+                                    />
+                                </div>
+                                <div className="form-group-modal">
+                                    <label>Fim</label>
+                                    <input 
+                                        type="time" 
+                                        value={selectedDateData.endTime} 
+                                        onChange={e => setSelectedDateData({...selectedDateData, endTime: e.target.value})}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                        <div className="modal-actions">
+                            {selectedDateData.id && (
+                                <button className="btn-delete" onClick={deleteSpecific} disabled={isSaving}>
+                                    <FaTrash/> Resetar
+                                </button>
+                            )}
+                            <button className="btn-save" onClick={saveSpecific} disabled={isSaving}>
+                                {isSaving ? 'Salvando...' : 'Salvar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <Footer />
         </div>
     );

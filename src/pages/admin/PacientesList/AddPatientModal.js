@@ -1,6 +1,7 @@
 // src/pages/admin/PacientesList/AddPatientModal.js
 import React, { useState } from 'react';
 import api from '../../../services/api';
+import { toast } from 'react-toastify';
 import './css/PacientesList.css'; 
 import profileIcon from '../../../assets/images/Header/perfilIcon.png'; // Importa o ícone padrão
 
@@ -46,7 +47,7 @@ const AddPatientModal = ({ onClose, onPatientAdded }) => {
                 await api.post(`/upload/user/${newUser.id}`, uploadFormData);
             }
 
-            alert('Paciente (usuário) cadastrado com sucesso!');
+            toast.success('Paciente cadastrado com sucesso!');
             onPatientAdded();
         } catch (err) {
             const errorMessage = err.response?.data?.message || "Erro ao cadastrar paciente.";

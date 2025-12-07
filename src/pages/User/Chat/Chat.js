@@ -9,6 +9,7 @@ import { IoSend, IoArrowBack } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { firestore } from '../../../services/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 import './css/chat-styles.css';
 
 const Chat = () => {
@@ -42,9 +43,6 @@ const Chat = () => {
         if (!chatRoomId) return;
         setLoading(true);
 
-        // DIAGNÓSTICO: Verifica se o chatRoomId está chegando
-        console.log("Conectando ao chat do usuário. Consultation ID:", consultationId, "UUID (Room):", chatRoomId);
-
         // LÓGICA CORRETA: Usa 'chatRoomId' se existir.
         // Se for uma consulta muito antiga sem UUID, usa o ID normal (fallback)
         const roomId = chatRoomId || consultationId;
@@ -59,7 +57,6 @@ const Chat = () => {
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const msgs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            console.log("Firebase snapshot recebido. Total de mensagens:", msgs.length);
             setMessages(msgs);
             setLoading(false);
         }, (err) => {
@@ -68,7 +65,6 @@ const Chat = () => {
             setLoading(false);
         });
         return () => {
-            console.log("Limpando listener do Firebase");
             unsubscribe();
         };
     }, [chatRoomId, consultationId]);
@@ -86,11 +82,9 @@ const Chat = () => {
         } catch (err) {
              console.error("Erro ao enviar mensagem:", err);
             setNewMessage(originalMessage);
-            alert("Não foi possível enviar a mensagem.");
+            toast.error("Não foi possível enviar a mensagem.");
         }
     };
-
-    console.log("Renderizando chat. Messages:", messages.length, "Loading:", loading);
 
     return (
         <div className="user-chat-page">

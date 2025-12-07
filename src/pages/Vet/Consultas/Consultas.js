@@ -3,7 +3,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import HeaderVet from '../../../components/HeaderVet/HeaderVet';
 import Footer from '../../../components/Footer';
 import VetConsultasNav from '../components/VetConsultasNav';
+import ConfirmModal from '../../../components/ConfirmModal';
 import api from '../../../services/api';
+import { toast } from 'react-toastify';
 import '../css/styles.css';
 import { formatEnumLabel } from '../../../utils/format';
 
@@ -16,6 +18,7 @@ const Consultas = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [dataAtual] = useState(new Date());
+    const [confirmAction, setConfirmAction] = useState({ isOpen: false, type: null, id: null });
     
     const navigate = useNavigate();
 
@@ -44,10 +47,10 @@ const Consultas = () => {
     const handleAction = async (actionFn, successMsg, errorMsg) => {
         try {
             await actionFn();
-            alert(successMsg);
-            fetchConsultas(); // Atualiza a lista
+            toast.success(successMsg);
+            fetchConsultas();
         } catch (err) {
-            alert(errorMsg);
+            toast.error(errorMsg);
             console.error(err);
         }
     };
@@ -59,16 +62,22 @@ const Consultas = () => {
 
     const handleDecline = (e, id) => {
         e.stopPropagation();
-        if (window.confirm('Tem certeza que deseja recusar esta consulta?')) {
-            handleAction(() => api.post(`/consultas/${id}/reject`), 'Consulta recusada com sucesso!', 'Erro ao recusar consulta.');
-        }
+        setConfirmAction({ isOpen: true, type: 'decline', id });
     };
 
     const handleCancel = (e, id) => {
         e.stopPropagation();
-        if (window.confirm('Tem certeza que deseja CANCELAR esta consulta agendada?')) {
-            handleAction(() => api.post(`/consultas/${id}/cancel`), 'Consulta cancelada com sucesso!', 'Erro ao cancelar consulta.');
+        setConfirmAction({ isOpen: true, type: 'cancel', id });
+    };
+
+    const confirmActionHandler = async () => {
+        const { type, id } = confirmAction;
+        if (type === 'decline') {
+            await handleAction(() => api.post(`/consultas/${id}/reject`), 'Consulta recusada com sucesso!', 'Erro ao recusar consulta.');
+        } else if (type === 'cancel') {
+            await handleAction(() => api.post(`/consultas/${id}/cancel`), 'Consulta cancelada com sucesso!', 'Erro ao cancelar consulta.');
         }
+        setConfirmAction({ isOpen: false, type: null, id: null });
     };
     
     const handleCardClick = (consulta) => {
@@ -201,6 +210,20 @@ const Consultas = () => {
                     {renderContent()}
                 </div>
             </main>
+
+            <ConfirmModal
+                isOpen={confirmAction.isOpen}
+                title={confirmAction.type === 'decline' ? 'Recusar Consulta' : 'Cancelar Consulta'}
+                message={confirmAction.type === 'decline' 
+                    ? 'Tem certeza que deseja recusar esta consulta?' 
+                    : 'Tem certeza que deseja cancelar esta consulta agendada?'}
+                onConfirm={confirmActionHandler}
+                onCancel={() => setConfirmAction({ isOpen: false, type: null, id: null })}
+                confirmText={confirmAction.type === 'decline' ? 'Recusar' : 'Cancelar'}
+                cancelText="Voltar"
+                type="warning"
+            />
+
             <Footer />
         </div>
     );
